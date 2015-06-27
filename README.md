@@ -17,18 +17,17 @@ Just add it to your ``rebar.config`` deps:
   {deps, [
     ...
     {lhc, ".*",
-      {git, "git@github.com:YOURNAME/lhc.git", "master"}}
+      {git, "git@github.com:lfex/lhc.git", "master"}}
       ]}.
 ```
 
 And then do the usual:
 
 ```bash
-    $ rebar get-deps
     $ rebar compile
 ```
 
 
 ## Usage
 
-Add content to me here!
+TBD
