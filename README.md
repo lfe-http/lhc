@@ -30,4 +30,4 @@ And then do the usual:
 
 ## Usage
 
-TBD
+Usage information is provided in the [documentation](http://lfex.github.io/lhc/).
