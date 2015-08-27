@@ -60,6 +60,15 @@
 
 ;;; DELETE
 
+(defun delete (url)
+  (delete url '() (get-default-options)))
+
+(defun delete (url options)
+  (delete url '() options))
+
+(defun delete (url headers options)
+  (request url 'DELETE headers "" options))
+
 ;;; TRACE
 
 ;;; OPTIONS
