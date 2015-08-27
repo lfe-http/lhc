@@ -17,7 +17,7 @@ docs: $(SLATE_GIT_HACK)
 	cd docs && rake build
 
 commit:
-	git commit -a && git push --all
+	-git commit -a && git push --all
 
 publish: commit docs
 	rm -rf $(DOCS_BUILD_DIR)/.git
