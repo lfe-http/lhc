@@ -16,7 +16,10 @@ devdocs: $(SLATE_GIT_HACK)
 docs: $(SLATE_GIT_HACK)
 	cd docs && rake build
 
-publish: docs
+commit:
+	git commit -a && git push --all
+
+publish: commit docs
 	rm -rf $(DOCS_BUILD_DIR)/.git
 	cd $(DOCS_BUILD_DIR) && \
 	git init && \
