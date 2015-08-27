@@ -12,7 +12,7 @@
 ;;; GET
 
 (defun get (url)
-  (get url (get-default-options)))
+  (get url '() (get-default-options)))
 
 (defun get (url options)
   (get url '() options))
@@ -22,7 +22,7 @@
 
 ;;; HEAD
 (defun head (url)
-  (head url (get-default-options)))
+  (head url '() (get-default-options)))
 
 (defun head (url options)
   (head url '() options))
