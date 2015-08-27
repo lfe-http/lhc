@@ -47,6 +47,13 @@ Erlang networking services, SSL support, etc.)
 
 ## ``get``
 
+```lfe
+> (lhc:get "http://google.com/")
+"<HTML><HEAD><meta http-equiv=\"content-type\" ... </HTML>\r\n"
+>
+```
+
+```
 * ``lhc:get/1`` - takes a URL
 * ``lhc:get/2`` - takes a URL and lhc options
 * ``lhc:get/2`` - takes a URL, list of headers, and lhc options
@@ -56,6 +63,20 @@ option, each of these will return a parsed result iof the content obtained by
 ``lhttpc``.
 
 ## ``head``
+
+```lfe
+> (lhc:head "http://google.com/")
+(#("X-Frame-Options" "SAMEORIGIN")
+ #("X-Xss-Protection" "1; mode=block")
+ #("Content-Length" "219")
+ #("Server" "gws")
+ #("Cache-Control" "public, max-age=2592000")
+ #("Expires" "Sat, 26 Sep 2015 04:38:28 GMT")
+ #("Date" "Thu, 27 Aug 2015 04:38:28 GMT")
+ #("Content-Type" "text/html; charset=UTF-8")
+ #("Location" "http://www.google.com/"))
+> (lhc:get "http://google.com/")
+```
 
 * ``lhc:head/1`` - takes a URL
 * ``lhc:head/2`` - takes a URL and lhc options
