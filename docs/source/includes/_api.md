@@ -1,5 +1,13 @@
 # The API
 
+Each of the API functions that map to an HTTP verb have at least one arity
+that supports setting lhc options which are passed to ``lhc:request``.
+These options may have zero or more of the following:
+
+* ``return`` - return type. Can be one of ``body`` (default), ``status``,
+  ``headers`` or ``all``
+* ``callback`` - the function that gets called once a result is obtained
+  from the ``lhttpc`` client library
 
 ## ``start``
 
@@ -39,11 +47,22 @@ Erlang networking services, SSL support, etc.)
 
 ## ``get``
 
-[Code ready, need docs]
+* ``lhc:get/1`` - takes a URL
+* ``lhc:get/2`` - takes a URL and lhc options
+* ``lhc:get/2`` - takes a URL, list of headers, and lhc options
+
+Depending upon the ``return`` option (default being ``body``) and  ``callback``
+option, each of these will return a parsed result iof the content obtained by
+``lhttpc``.
 
 ## ``head``
 
-[Code ready, need docs]
+* ``lhc:head/1`` - takes a URL
+* ``lhc:head/2`` - takes a URL and lhc options
+* ``lhc:head/2`` - takes a URL, list of headers, and lhc options
+
+Returns just the parsed headers of the result from ``lhttpc``. By defualt, this
+is a list of tuples, each being a key/value pair of header name and head value.
 
 ## ``post``
 
