@@ -33,13 +33,13 @@
 ;;; POST
 
 (defun post (url)
-  (post url "" (get-default-options)))
+  (post url "" '() (get-default-options)))
 
 (defun post (url data)
-  (post url data (get-default-options)))
+  (post url data '() (get-default-options)))
 
 (defun post (url data options)
-  (post url '() data options))
+  (post url data '() options))
 
 (defun post (url data headers options)
   (request url 'POST headers data options))
@@ -47,15 +47,15 @@
 ;;; PUT
 
 (defun put (url)
-  (put url (get-default-options)))
+  (put url "" '() (get-default-options)))
 
-(defun put (url options)
-  (put url "" options))
+(defun put (url data)
+  (put url data '() (get-default-options)))
 
 (defun put (url data options)
-  (put url '() data options))
+  (put url data '() options))
 
-(defun put (url headers data options)
+(defun put (url data headers options)
   (request url 'PUT headers data options))
 
 ;;; DELETE
