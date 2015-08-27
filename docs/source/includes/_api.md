@@ -88,7 +88,7 @@ is a list of tuples, each being a key/value pair of header name and head value.
 
 ## ``post``
 
-> To post, we first create a payload. The demo REST API we're testing against
+> To ``POST``, we first create a payload. The demo REST API we're testing against
 > can take any string value, but many applications will expect JSON data. Let's
 > use JSON here:
 
@@ -98,7 +98,7 @@ is a list of tuples, each being a key/value pair of header name and head value.
 >
 ```
 
-> With our payload in hand, we can now ``POST``:
+> With our payload in hand, we can now ``POST`` to create a new order:
 
 ```lfe
 > (lhc:post "http://localhost:8000/demos/store/order" payload)
@@ -114,10 +114,28 @@ is a list of tuples, each being a key/value pair of header name and head value.
 
 ## ``put``
 
-* ``lhc:put/1`` - takes a URL, making an empty data ``POST``
-* ``lhc:put/2`` - takes a URL and ``POST`` data
-* ``lhc:put/3`` - takes a URL, ``POST`` data, and lhc options
-* ``lhc:put/4`` - takes a URL, ``POST`` data, a list of headers, and lhc
+> To ``PUT``, we first create a payload. The demo REST API we're testing against
+> can take any string value, but many applications will expect JSON data. Let's
+> use JSON here:
+
+```lfe
+> (set payload (ljson:encode '(#(model #"2014 P1800"))))
+#"{"model":"2014 P1800"}"
+>
+```
+
+> We can now ``PUT`` to update our order:
+
+```lfe
+> (lhc:put "http://localhost:8000/demos/store/order/124" payload)
+"{\"result\": \"You updated order 124.\"}"
+>
+```
+
+* ``lhc:put/1`` - takes a URL, making an empty data ``PUT``
+* ``lhc:put/2`` - takes a URL and ``PUT`` data
+* ``lhc:put/3`` - takes a URL, ``PUT`` data, and lhc options
+* ``lhc:put/4`` - takes a URL, ``PUT`` data, a list of headers, and lhc
   options
 
 ## ``delete``
