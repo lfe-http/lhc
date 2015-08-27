@@ -10,7 +10,7 @@
 (#(inets ok) #(ssl ok) #(lhttpc ok) #(lhc ok))
 ```
 
-> If you attemtp to use the API without having first started it,
+> If you attempt to use the API without having first started it,
 > you will see errors like the following:
 
 ```lfe
