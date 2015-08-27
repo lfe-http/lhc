@@ -13,7 +13,7 @@ The lhc examples below are run against a YAWS REST server demo store. You can
 download and run the "store" yourself when you
 [clone the repo](https://github.com/lfex/yaws-rest-starter).
 
-For POST'ing data, we use the [ljson](https://github.com/lfex/ljson) LFE
+For ``POST``ing data, we use the [ljson](https://github.com/lfex/ljson) LFE
 library. To make this available to your project, simply add it to your
 ``rebar.config`` file, per the instructions on the ljson project README.
 
@@ -93,8 +93,8 @@ is a list of tuples, each being a key/value pair of header name and head value.
 > use JSON here:
 
 ```lfe
-> (set payload (ljson:encode '(#(make "Volvo") #(model "P1800"))))
-#B(123 34 109 97 107 101 34 58 91 56 54 44 49 49 49 44 49 48 56 ...)
+> (set payload (ljson:encode '(#(make #"Volvo") #(model #"P1800"))))
+#"{"make":"Volvo","model":"P1800"}"
 >
 ```
 
@@ -114,7 +114,11 @@ is a list of tuples, each being a key/value pair of header name and head value.
 
 ## ``put``
 
-[Code ready, need docs]
+* ``lhc:put/1`` - takes a URL, making an empty data ``POST``
+* ``lhc:put/2`` - takes a URL and ``POST`` data
+* ``lhc:put/3`` - takes a URL, ``POST`` data, and lhc options
+* ``lhc:put/4`` - takes a URL, ``POST`` data, a list of headers, and lhc
+  options
 
 ## ``delete``
 
