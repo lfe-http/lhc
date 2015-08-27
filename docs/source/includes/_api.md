@@ -114,9 +114,7 @@ is a list of tuples, each being a key/value pair of header name and head value.
 
 ## ``put``
 
-> To ``PUT``, we first create a payload. The demo REST API we're testing against
-> can take any string value, but many applications will expect JSON data. Let's
-> use JSON here:
+> To ``PUT``, we first create a payload similar to what we did for ``POST``:
 
 ```lfe
 > (set payload (ljson:encode '(#(model #"2014 P1800"))))
