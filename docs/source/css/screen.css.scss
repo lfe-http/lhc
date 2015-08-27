@@ -499,9 +499,14 @@ html, body {
     background: $aside-notice-bg;
     line-height: 1.6;
 
-    &.warning {
-      background-color: $aside-warning-bg;
-      @include text-shadow(0 1px 0 lighten($aside-warning-bg, 15%));
+    &.danger {
+      background-color: $aside-danger-bg;
+      @include text-shadow(0 1px 0 lighten($aside-danger-bg, 15%));
+    }
+
+    &.caution {
+      background-color: $aside-caution-bg;
+      @include text-shadow(0 1px 0 lighten($aside-caution-bg, 15%));
     }
 
     &.success {
@@ -520,7 +525,11 @@ html, body {
     @extend %icon-info-sign;
   }
 
-  aside.warning:before {
+  aside.danger:before {
+    @extend %icon-exclamation-sign;
+  }
+
+  aside.caution:before {
     @extend %icon-exclamation-sign;
   }
 
