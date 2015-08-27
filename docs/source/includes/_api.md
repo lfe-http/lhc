@@ -53,7 +53,6 @@ Erlang networking services, SSL support, etc.)
 >
 ```
 
-```
 * ``lhc:get/1`` - takes a URL
 * ``lhc:get/2`` - takes a URL and lhc options
 * ``lhc:get/2`` - takes a URL, list of headers, and lhc options
