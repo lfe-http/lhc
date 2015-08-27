@@ -33,10 +33,10 @@
 ;;; POST
 
 (defun post (url)
-  (post url (get-default-options)))
+  (post url "" (get-default-options)))
 
-(defun post (url options)
-  (post url "" options))
+(defun post (url data)
+  (post url data (get-default-options)))
 
 (defun post (url data options)
   (post url '() data options))
