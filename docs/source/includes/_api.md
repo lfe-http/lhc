@@ -74,7 +74,7 @@ option, each of these will return a parsed result iof the content obtained by
  #("Date" "Thu, 27 Aug 2015 04:38:28 GMT")
  #("Content-Type" "text/html; charset=UTF-8")
  #("Location" "http://www.google.com/"))
-> (lhc:get "http://google.com/")
+>
 ```
 
 * ``lhc:head/1`` - takes a URL
