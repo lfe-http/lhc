@@ -41,7 +41,7 @@
 (defun post (url data options)
   (post url '() data options))
 
-(defun post (url data data options)
+(defun post (url data headers options)
   (request url 'POST headers data options))
 
 ;;; PUT
