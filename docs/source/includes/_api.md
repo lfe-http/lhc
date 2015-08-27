@@ -101,7 +101,7 @@ is a list of tuples, each being a key/value pair of header name and head value.
 > With our payload in hand, we can now ``POST`` to create a new order:
 
 ```lfe
-> (lhc:post "http://localhost:8000/demos/store/order" payload)
+> (lhc:post "http://localhost:8000/demos/store3/order" payload)
 "{\"result\": \"You made a new order.\"}"
 >
 ```
@@ -125,7 +125,7 @@ is a list of tuples, each being a key/value pair of header name and head value.
 > We can now ``PUT`` to update our order:
 
 ```lfe
-> (lhc:put "http://localhost:8000/demos/store/order/124" payload)
+> (lhc:put "http://localhost:8000/demos/store3/order/124" payload)
 "{\"result\": \"You updated order 124.\"}"
 >
 ```
@@ -138,7 +138,17 @@ is a list of tuples, each being a key/value pair of header name and head value.
 
 ## ``delete``
 
-TBD
+> ``DELETE``ing is as simple as passing the appropriate URL:
+
+```lfe
+> (lhc:delete "http://localhost:8000/demos/store3/order/124")
+"{\"result\": \"You deleted order 124.\"}"
+>
+```
+
+* ``lhc:delete/1`` - takes a URL
+* ``lhc:delete/2`` - takes a URL and lhc options
+* ``lhc:delete/3`` - takes a URL, list of headers, and lhc options
 
 ## ``trace``
 
