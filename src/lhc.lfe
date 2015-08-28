@@ -4,10 +4,10 @@
 (include-lib "lhc/include/lhc-options.lfe")
 
 (defun start ()
-  (start 'lhttpc))
+  (start (lcfg:get-in '(lhc backend))))
 
 (defun start (backend)
-  (erlang:put (get-backend-key) backend)
+  (change-backend backend)
   (start-deps))
 
 ;;; GET
@@ -223,6 +223,9 @@
 
 (defun get-backend ()
   (erlang:get (get-backend-key)))
+
+(defun change-backend (backend)
+  (erlang:put (get-backend-key) backend))
 
 ;;; Dependencies
 
