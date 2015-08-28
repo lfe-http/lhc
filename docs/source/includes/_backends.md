@@ -7,10 +7,10 @@ Current backends are:
 * [httpc](http://erlang.org/doc/man/httpc.html)
 * [lhttpc](http://github.com/billosys/lhttpc)
 * [dlhttpc](https://github.com/ferd/dlhttpc)
+* [hackney](https://github.com/benoitc/hackney)
 
 Planned backends currently include the following:
 
-* [hackney](https://github.com/benoitc/hackney)
 * [ibrowse](https://github.com/cmullaparthi/ibrowse)
 * [shotgun](https://github.com/inaka/shotgun)
 * [fusco](https://github.com/esl/fusco)
