@@ -37,3 +37,12 @@
   (list_to_atom
     (string:to_lower
       (atom_to_list method))))
+
+;;; dlhttpc Backend
+
+(defun start-dlhttpc ()
+  `(#(dispcout ,(application:start 'dispcount))
+    #(dlhttpc ,(dlhttpc:start))))
+
+(defun dlhttpc (url method headers data timeout dlhttpc-opts)
+  (dlhttpc:request url method headers data timeout dlhttpc-opts))

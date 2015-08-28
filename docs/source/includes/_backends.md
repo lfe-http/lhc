@@ -1,16 +1,16 @@
 # Backends
 
-lhc supports two backends, with many more future ones planned.
+lhc supports a handfule of backends, with more future ones planned.
 
 Current backends are:
 
 * [httpc](http://erlang.org/doc/man/httpc.html)
 * [lhttpc](http://github.com/billosys/lhttpc)
+* [dlhttpc](https://github.com/ferd/dlhttpc)
 
 Planned backends currently include the following:
 
 * [hackney](https://github.com/benoitc/hackney)
-* [dlhttpc](https://github.com/ferd/dlhttpc)
 * [ibrowse](https://github.com/cmullaparthi/ibrowse)
 * [shotgun](https://github.com/inaka/shotgun)
 * [fusco](https://github.com/esl/fusco)
