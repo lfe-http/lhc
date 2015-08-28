@@ -37,8 +37,7 @@
            'HEAD
            (make-headers headers)
            ""
-           (++ '(#(return headers))
-               (make-options options))))
+           (make-options options)))
 
 ;;; POST
 

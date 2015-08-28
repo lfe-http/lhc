@@ -93,6 +93,8 @@
      (`#(ok ,result)
       (binary_to_list result))
      (x `#(error x))))
+  ((_ (match-lhc-opts return 'body) `#(ok ,_ ,hdrs))
+    hdrs)
   ((_ (match-lhc-opts return 'binary) `#(ok ,_ ,_ ,bdy))
    bdy)
   ((_ (match-lhc-opts return 'all) `#(ok ,sts ,hdrs ,ref))
