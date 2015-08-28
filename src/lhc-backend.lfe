@@ -3,10 +3,16 @@
 
 ;;; lhttpc Backend
 
+(defun start-lhttpc ()
+  `(#(lhttpc ,(lhttpc:start))))
+
 (defun lhttpc (url method headers data timeout lhttpc-opts)
   (lhttpc:request url method headers data timeout lhttpc-opts))
 
 ;;; httpc Backend
+
+(defun start-httpc ()
+  '())
 
 (defun httpc
   ((_ 'PATCH _ _ _ _)

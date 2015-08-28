@@ -247,7 +247,9 @@
 ;;; Dependencies
 
 (defun start-deps ()
-  `(#(inets ,(inets:start))
-    #(ssl ,(ssl:start))
-    #(lhttpc ,(lhttpc:start))
-    #(lhc ok)))
+  (++ `(#(inets ,(inets:start))
+        #(ssl ,(ssl:start)))
+      (call (get-backend-module)
+            (list_to_atom (++ "start-"
+                              (atom_to_list (get-backend)))))
+      `(#(lhc ok))))
