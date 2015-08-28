@@ -11,6 +11,8 @@ toc_footers:
 includes:
   - intro
   - api
+  - backends
+  - misc
 
 search: true
 ---
