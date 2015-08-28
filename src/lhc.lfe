@@ -4,7 +4,7 @@
 (include-lib "lhc/include/lhc-options.lfe")
 
 (defun start ()
-  (start (lcfg:get-in '(lhc backend))))
+  (start (get-backend-cfg)))
 
 (defun start (backend)
   (change-backend backend)
@@ -222,7 +222,17 @@
   'lhc-backend)
 
 (defun get-backend ()
-  (erlang:get (get-backend-key)))
+  (let ((default (erlang:get (get-backend-key))))
+   (case default
+     ('undefined (get-backend-cfg))
+     (_ default))))
+
+(defun get-backend
+  ((`(#(return list)))
+   (atom_to_list (get-backend))))
+
+(defun get-backend-cfg ()
+  (lcfg:get-in '(lhc backend)))
 
 (defun change-backend (backend)
   (erlang:put (get-backend-key) backend))

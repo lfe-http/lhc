@@ -263,7 +263,7 @@ Erlang.
 > The lhc user agent string:
 
 ```
-"LFE Little HTTP Client (lhc/LFE)/0.1.0 (+http://github.com/lfex/lhc)"
+"LFE Little HTTP Client/0.1.0 (LFE 0.10.0-dev; Erlang 18; backend=lhttpc) (+http://github.com/lfex/lhc)"
 ```
 
 The lhc user agent will show up in any HTTP server log files where client user
