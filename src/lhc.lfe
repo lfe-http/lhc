@@ -12,75 +12,141 @@
 ;;; GET
 
 (defun get (url)
-  (get url '() (get-default-options)))
+  (get url '() (make-options)))
 
 (defun get (url options)
-  (get url '() options))
+  (get url '() (make-options options)))
 
 (defun get (url headers options)
-  (request url 'GET headers "" options))
+  (request url
+           'GET
+           (make-headers headers)
+           ""
+           (make-options options)))
 
 ;;; HEAD
 (defun head (url)
-  (head url '() (get-default-options)))
+  (head url '() (make-options)))
 
 (defun head (url options)
-  (head url '() options))
+  (head url '() (make-options options)))
 
 (defun head (url headers options)
-  (request url 'HEAD headers "" (++ '(#(return headers)) options)))
+  (request url
+           'HEAD
+           (make-headers headers)
+           ""
+           (++ '(#(return headers))
+               (make-options options))))
 
 ;;; POST
 
 (defun post (url)
-  (post url "" '() (get-default-options)))
+  (post url "" '() (make-options)))
 
 (defun post (url data)
-  (post url data '() (get-default-options)))
+  (post url data '() (make-options)))
 
 (defun post (url data options)
-  (post url data '() options))
+  (post url data '() (make-options options)))
 
 (defun post (url data headers options)
-  (request url 'POST headers data options))
+  (request url
+           'POST
+           (make-headers headers)
+           data
+           (make-options options)))
 
 ;;; PUT
 
 (defun put (url)
-  (put url "" '() (get-default-options)))
+  (put url "" '() (make-options)))
 
 (defun put (url data)
-  (put url data '() (get-default-options)))
+  (put url data '() (make-options)))
 
 (defun put (url data options)
-  (put url data '() options))
+  (put url data '() (make-options options)))
 
 (defun put (url data headers options)
-  (request url 'PUT headers data options))
+  (request url
+           'PUT
+           (make-headers headers)
+           data
+           (make-options options)))
 
 ;;; DELETE
 
 (defun delete (url)
-  (delete url '() (get-default-options)))
+  (delete url '() (make-options)))
 
 (defun delete (url options)
-  (delete url '() options))
+  (delete url '() (make-options options)))
 
 (defun delete (url headers options)
-  (request url 'DELETE headers "" options))
+  (request url
+           'DELETE
+           (make-headers headers)
+           ""
+           (make-options options)))
 
 ;;; TRACE
 
+(defun trace (url)
+  (trace url "" '() (make-options)))
+
+(defun trace (url data)
+  (trace url data '() (make-options)))
+
+(defun trace (url data options)
+  (trace url data '() (make-options options)))
+
+(defun trace (url data headers options)
+  (request url
+           'TRACE
+           (make-headers headers)
+           data
+          (make-options options)))
+
 ;;; OPTIONS
+
+(defun options (url)
+  (options url '() (make-options)))
+
+(defun options (url options)
+  (options url '() (make-options options)))
+
+(defun options (url headers options)
+  (request url
+           'OPTIONS
+           (make-headers headers)
+           ""
+           (make-options options)))
 
 ;;; CONNECT
 
 ;;; PATCH
 
+(defun patch (url)
+  (patch url "" '() (make-options)))
+
+(defun patch (url data)
+  (patch url data '() (make-options)))
+
+(defun patch (url data options)
+  (patch url data '() (make-options options)))
+
+(defun patch (url data headers options)
+  (request url
+           'PATCH
+           (make-headers headers)
+           data
+           (make-options options)))
+
 ;;; Request wrapper of lhttpc
 
 (defun request (url method data)
-  (request url method data (get-default-options)))
+  (request url method data (make-options)))
 
 (defun request (url method data options)
   (request url method '() data options))
@@ -131,7 +197,20 @@
   `(#(return body)
     #(callback ,#'lhc:parse-results/3)))
 
+(defun make-options ()
+  (get-default-options))
+
+(defun make-options (opts)
+  (++ opts (get-default-options)))
+
 (defun opts->rec (opts)
   (make-lhc-opts return (proplists:get_value 'return opts)
                  callback (proplists:get_value 'callback opts)))
 
+;;; Headers
+
+(defun get-default-headers ()
+ `(#("User-Agent" ,(lhc-util:user-agent))))
+
+(defun make-headers (headers)
+  (++ headers (get-default-headers)))
