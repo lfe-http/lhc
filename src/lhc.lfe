@@ -240,7 +240,9 @@
   (lcfg:get-in '(lhc backend)))
 
 (defun change-backend (backend)
-  (erlang:put (get-backend-key) backend))
+  `(#(backend
+       #(previous ,(erlang:put (get-backend-key) backend))
+       #(current ,backend))))
 
 ;;; Dependencies
 
