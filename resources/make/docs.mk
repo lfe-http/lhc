@@ -2,6 +2,7 @@
 REPO = $(shell git config --get remote.origin.url)
 DOCS_DIR = docs
 DOCS_BUILD_DIR = $(DOCS_DIR)/build
+DOCS_PROD_DIR = $(DOCS_DIR)/master
 SLATE_GIT_HACK = $(DOCS_DIR)/.git
 
 $(SLATE_GIT_HACK):
@@ -20,8 +21,10 @@ commit:
 	-git commit -a && git push --all
 
 publish: commit docs
-	rm -rf $(DOCS_BUILD_DIR)/.git
-	cd $(DOCS_BUILD_DIR) && \
+	rm -rf $(DOCS_PROD_DIR)/.git $(DOCS_PROD_DIR)/current
+	cp -r $(DOCS_BUILD_DIR) $(DOCS_PROD_DIR)/current
+	rm -rf $(DOCS_PROD_DIR)/*/.git
+	cd $(DOCS_PROD_DIR) && \
 	git init && \
 	git add * &> /dev/null && \
 	git commit -a -m "Generated content." &> /dev/null && \
