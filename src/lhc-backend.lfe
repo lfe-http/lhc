@@ -107,3 +107,51 @@
    (io:format "No match.~n")
    `(,args ,opts ,all)))
 
+;;; ibrowse
+
+(defun start-ibrowse ()
+  (let ((`#(,msg ,_pid) (ibrowse:start)))
+  `(#(ibrowse ,msg))))
+
+(defun ibrowse (url method headers data timeout ibrowse-opts)
+  (ibrowse:send_req url
+                    headers
+                    (get-httpc-method method)
+                    data
+                    ibrowse-opts
+                    timeout))
+
+(defun ibrowse-default-options ()
+  `(#(return body)
+    #(callback ,#'lhc-backend:ibrowse-parse-results/3)))
+
+(defun ibrowse-parse-results
+  ((args opts result) (when (is_list opts))
+   ;; we want to make sure that any library using lhc and setting their own
+   ;; parse-results callback has *their* callback executed
+   (funcall (proplists:get_value 'callback opts #'ibrowse-parse-results/3)
+            args
+            (lhc:opts->rec opts)
+            result))
+  ((_ (match-lhc-opts return 'status) `#(ok ,sts ,_ ,_))
+   sts)
+  ((_ (match-lhc-opts return 'headers) `#(ok ,_ ,hdrs ,_))
+   hdrs)
+  ((_ (match-lhc-opts return 'body) `#(ok ,_ ,hdrs ()))
+    hdrs)
+  ((_ (match-lhc-opts return 'body) `#(ok ,_ ,hdrs))
+    hdrs)
+  ((_ (match-lhc-opts return 'body) `#(ok ,_ ,_ ,bdy))
+   bdy)
+  ((_ (match-lhc-opts return 'binary) `#(ok ,_ ,_ ,bdy))
+   bdy)
+  ((_ (match-lhc-opts return 'all) `#(ok ,sts ,hdrs ,bdy))
+   `#(ok (#(status ,sts)
+          #(headers ,hdrs)
+          #(body ,bdy))))
+  ((_ _ (= `#(error ,_) err))
+   err)
+  ((args opts all)
+   (io:format "No match.~n")
+   `(,args ,opts ,all)))
+
