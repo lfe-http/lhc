@@ -163,7 +163,9 @@
     (funcall (proplists:get_value 'callback options)
              (list url method headers data timeout lhttpc-opts options)
              options
-             (lhttpc:request url method headers data timeout lhttpc-opts))))
+             (call (get-backend-module)
+                   (get-backend)
+                   url method headers data timeout lhttpc-opts))))
 
 ;;; Callback
 
@@ -219,6 +221,9 @@
 ;;; Backend
 
 (defun get-backend-key ()
+  'lhc-backend)
+
+(defun get-backend-module ()
   'lhc-backend)
 
 (defun get-backend ()
