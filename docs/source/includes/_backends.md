@@ -8,10 +8,10 @@ Current backends are:
 * [lhttpc](http://github.com/billosys/lhttpc)
 * [dlhttpc](https://github.com/ferd/dlhttpc)
 * [hackney](https://github.com/benoitc/hackney)
+* [ibrowse](https://github.com/cmullaparthi/ibrowse)
 
 Planned backends currently include the following:
 
-* [ibrowse](https://github.com/cmullaparthi/ibrowse)
 * [shotgun](https://github.com/inaka/shotgun)
 * [fusco](https://github.com/esl/fusco)
 
