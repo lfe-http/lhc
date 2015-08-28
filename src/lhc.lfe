@@ -4,14 +4,11 @@
 (include-lib "lhc/include/lhc-options.lfe")
 
 (defun start ()
-  `(#(inets ,(inets:start))
-    #(ssl ,(ssl:start))
-    #(lhttpc ,(lhttpc:start))
-    #(lhc ok)))
+  (start 'lhttpc))
 
 (defun start (backend)
   (erlang:put (get-backend-key) backend)
-  (start))
+  (start-deps))
 
 ;;; GET
 
@@ -226,3 +223,11 @@
 
 (defun get-backend ()
   (erlang:get (get-backend-key)))
+
+;;; Dependencies
+
+(defun start-deps ()
+  `(#(inets ,(inets:start))
+    #(ssl ,(ssl:start))
+    #(lhttpc ,(lhttpc:start))
+    #(lhc ok)))
