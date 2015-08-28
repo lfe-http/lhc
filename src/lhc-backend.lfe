@@ -8,18 +8,22 @@
 
 ;;; httpc Backend
 
-(defun httpc (url method headers data timeout httpc-opts)
-  (let ((request `#(,url ,headers))
-        (`#(,http-opts ,opts ,profile) (get-httpc-opts httpc-opts)))
-    (httpc:request (get-httpc-method method)
-                   request
-                   http-opts
-                   opts
-                   profile)))
+(defun httpc
+  ((_ 'PATCH _ _ _ _)
+   #(error #(httpc unsupported-client-method)))
+  ((_ 'CONNECT _ _ _ _)
+   #(error #(httpc unsupported-client-method)))
+  ((url method headers data timeout httpc-opts)
+   (let ((request `#(,url ,headers))
+         (`#(,http-opts ,opts) (get-httpc-opts httpc-opts)))
+     (httpc:request (get-httpc-method method)
+                    request
+                    http-opts
+                    opts))))
 
 (defun get-httpc-opts
   (('())
-   #(() () lhc-profile))
+   `#(() ()))
   ((combined-opts)
    combined-opts))
 
