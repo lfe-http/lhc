@@ -158,14 +158,14 @@
 (defun request (url method headers data timeout options)
   (request url method headers data timeout '() options))
 
-(defun request (url method headers data timeout lhttpc-opts lhc-opts)
-  (let ((options (++ lhc-opts (get-default-options))))
-    (funcall (proplists:get_value 'callback options)
-             (list url method headers data timeout lhttpc-opts options)
-             options
+(defun request (url method headers data timeout backend-opts lhc-opts)
+  (let ((opts (make-options lhc-opts)))
+    (funcall (proplists:get_value 'callback opts)
+             (list url method headers data timeout backend-opts opts)
+             opts
              (call (get-backend-module)
                    (get-backend)
-                   url method headers data timeout lhttpc-opts))))
+                   url method headers data timeout backend-opts))))
 
 ;;; Callback
 
@@ -201,7 +201,7 @@
     #(callback ,#'lhc:parse-results/3)))
 
 (defun make-options ()
-  (get-default-options))
+  (get-backend-options))
 
 (defun make-options (opts)
   (++ opts (get-default-options)))
@@ -243,6 +243,11 @@
   `(#(backend
        #(previous ,(erlang:put (get-backend-key) backend))
        #(current ,backend))))
+
+(defun get-backend-options ()
+  (call (get-backend-module)
+        (list_to_atom (++ (atom_to_list (get-backend))
+                          "-default-options"))))
 
 ;;; Dependencies
 

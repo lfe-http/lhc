@@ -52,6 +52,13 @@ Bakends my be selected one of three ways:
  * Starting lhc with a particular bacend.
  * Changing the backend after lhc has been started.
 
+<aside class="danger">
+If you wish to use a backend, you <strong>must</strong> have the desired HTTP
+client library installed, as well as all of its dependencies. Attempting to
+start a backend that hasn't been installed (or whose libraries are not present
+in <code>ERL_LIBS</code>) will result in errors upon startup.
+</aside>
+
 ## Backend Information
 
 > Find out which backend you are using:
