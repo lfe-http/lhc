@@ -13,6 +13,7 @@ includes:
   - api
   - backends
   - misc
+  - versions
 
 search: true
 ---
