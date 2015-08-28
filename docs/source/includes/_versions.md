@@ -1,13 +1,7 @@
 # Previous Versions
 
-Documentation is available for all previous releases at the following:
+Documentation is available for all previous releases:
 
-## Latest Release
-
-The documentation for the latest release is always available
-<a href="../current/">here</a>.
-
-## v0.1.0
-
-<a href="../v0.1.0/">Documentation for version 0.1.0</a>
+* [Development version](../current/)
+* [v0.1.0](../v0.1.0/)
 

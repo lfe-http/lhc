@@ -14,6 +14,7 @@ includes:
   - backends
   - misc
   - versions
+  - license
 
 search: true
 ---
