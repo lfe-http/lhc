@@ -9,6 +9,10 @@
     #(lhttpc ,(lhttpc:start))
     #(lhc ok)))
 
+(defun start (backend)
+  (erlang:put (get-backend-key) backend)
+  (start))
+
 ;;; GET
 
 (defun get (url)
@@ -214,3 +218,11 @@
 
 (defun make-headers (headers)
   (++ headers (get-default-headers)))
+
+;;; Backend
+
+(defun get-backend-key ()
+  'lhc-backend)
+
+(defun get-backend ()
+  (erlang:get (get-backend-key)))
