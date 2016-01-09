@@ -4,9 +4,11 @@
 
 <a href="resources/images/lhc.jpg"><img src="resources/images/lhc-small.jpg" /></a>
 
-##### Table of Contents
+
+#### Table of Contents
 
 * [Introduction](#introduction-)
+* [Dependencies](#dependencies-)
 * [Installation](#installation-)
 * [Usage](#usage-)
 * [Backends](#backends-)
@@ -15,8 +17,15 @@
 ## Introduction [&#x219F;](#table-of-contents)
 
 This is simply meant to be a dead-simple HTTP client for LFE projects. That's
-all there is to it. It uses lhttpc under the hood, which can be a little
-cumbersome for those new to Erlang when used directly.
+all there is to it. It can use one of several possible HTTP clients under the hood. Some of those can can be a little cumbersome for those new to Erlang when used directly, so lhc can be quite helpful for them.
+
+
+## Dependencies [&#x219F;](#contents)
+
+As of version 0.2.0, this project assumes that you have
+[rebar3](https://github.com/rebar/rebar3) installed somwhere in your ``$PATH``.
+It no longer uses the old version of rebar. If you do not wish to use rebar3,
+you may use the most recent rebar2-compatible release of lhc: 0.1.0.
 
 
 ## Installation [&#x219F;](#table-of-contents)
