@@ -26,7 +26,7 @@ publish: commit docs
 		rm -rf $(DOCS_PROD_DIR)/*/.git
 		cd $(DOCS_PROD_DIR) && \
 		git init && \
-		git add * &> /dev/null && \
+		git add * > /dev/null && \
 		git commit -a -m "Generated content." > /dev/null && \
 		git push -f $(REPO) master:gh-pages
 		cd $(DOCS_DIR) && \
