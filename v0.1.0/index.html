@@ -1,0 +1,527 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta content="IE=edge,chrome=1" http-equiv="X-UA-Compatible">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <title>lhc - LFE Little HTTP Client library</title>
+
+    <link href="css/screen.css" rel="stylesheet" type="text/css" media="screen" />
+    <link href="css/print.css" rel="stylesheet" type="text/css" media="print" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+      <script src="js/all.js" type="text/javascript"></script>
+
+      <script>
+        $(function() {
+          setupLanguages([null]);
+        });
+      </script>
+  </head>
+
+  <body class="index">
+    <a href="#" id="nav-button">
+      <span>
+        NAV
+        <div class="content"><span class="title">lhc - LFE Little HTTP Client library</span></div>
+      </span>
+    </a>
+    <div class="tocify-wrapper">
+      <div class="content"><span class="title">lhc - LFE Little HTTP Client library</span></div>
+        <div class="lang-selector">
+              <a href="#" data-language-name=""></a>
+        </div>
+        <div class="search">
+          <input type="text" class="search" id="input-search" placeholder="Search">
+        </div>
+        <ul class="search-results"></ul>
+      <div id="toc">
+      </div>
+        <ul class="toc-footer">
+            <li><a href='http://github.com/lfex/lhc/'>View the source</a></li>
+            <li><a href='http://github.com/tripit/slate'>Documentation Powered by Slate</a></li>
+        </ul>
+    </div>
+    <div class="page-wrapper">
+      <div class="dark-box"></div>
+      <div class="content">
+        
+          <h1 id="introduction">Introduction</h1>
+
+<p><em>Little (LFE) HTTP Client &ndash; A light-weight LFE wrapper around lhttpc</em></p>
+
+<p><a href="images/lhc.jpg"><img src="images/lhc-small.jpg" /></a></p>
+
+<p>This library is meant to be a dead-simple HTTP client for LFE projects. That&rsquo;s
+all there is to it. It uses lhttpc under the hood, which can be a little
+cumbersome for those new to Erlang when used directly; as such, lhc will likely
+provide a welcome alternative.</p>
+
+<aside class="success">
+The following API functions are ready to use:
+<ul>
+<li><code>get/1</code>, <code>get/2</code>, <code>get/3</code></li>
+<li><code>head/1</code>, <code>head/2</code>, <code>head/3</code></li>
+<li><code>post/1</code>, <code>post/2</code>, <code>post/3</code>, <code>post/4</code></li>
+<li><code>put/1</code>, <code>put/2</code>, <code>put/3</code>, <code>put/4</code></li>
+<li><code>delete/1</code>, <code>delete/2</code>, <code>delete/3</code></li>
+<li><code>trace/1</code>, <code>trace/2</code>, <code>trace/3</code>, <code>trace/4</code></li>
+<li><code>options/1</code>, <code>options/2</code>, <code>options/3</code></li>
+<li><code>patch/1</code>, <code>patch/2</code>, <code>patch/3</code>, <code>patch/4</code></li>
+<li><code>request/3</code>, <code>request/4</code>, <code>request/5</code>, <code>request/6</code>, <code>request/7</code></li>
+</ul>
+</aside>
+
+<aside class="caution">
+Note that the following have not been tested extensively (or possibly at all)
+against compliant servers:
+<ul>
+<li><code>trace/1</code>, <code>trace/2</code>, <code>trace/3</code>, <code>trace/4</code></li>
+</ul>
+</aside>
+
+<aside class="danger">
+Note that the following have not yet been implemented:
+<ul>
+<li>Functions for <code>CONNECT</code></li>
+</ul>
+</aside>
+
+<h1 id="installation">Installation</h1>
+
+<blockquote>
+<p>Just add it to your <code class="prettyprint">rebar.config</code> deps:</p>
+</blockquote>
+<pre class="highlight erlang"><code>  <span class="p">{</span><span class="n">deps</span><span class="p">,</span> <span class="p">[</span>
+    <span class="p">...</span>
+    <span class="p">{</span><span class="n">lhc</span><span class="p">,</span> <span class="s">".*"</span><span class="p">,</span>
+      <span class="p">{</span><span class="n">git</span><span class="p">,</span> <span class="s">"git@github.com:lfex/lhc.git"</span><span class="p">,</span> <span class="s">"master"</span><span class="p">}}</span>
+      <span class="p">]}.</span>
+</code></pre>
+
+<blockquote>
+<p>Then execute the usual <code class="prettyprint">rebar</code> command:</p>
+</blockquote>
+<pre class="highlight shell"><code>    <span class="nv">$ </span>rebar compile
+</code></pre>
+
+<p>See notes to the right.</p>
+
+          <h1 id="the-api">The API</h1>
+
+<p>Each of the API functions that map to an HTTP verb have at least one arity
+that supports setting lhc options which are passed to <code class="prettyprint">lhc:request</code>.
+These options may have zero or more of the following:</p>
+
+<ul>
+<li><code class="prettyprint">return</code> - return type. Can be one of <code class="prettyprint">body</code> (default), <code class="prettyprint">status</code>,
+<code class="prettyprint">headers</code> or <code class="prettyprint">all</code></li>
+<li><code class="prettyprint">callback</code> - the function that gets called once a result is obtained
+from the <code class="prettyprint">lhttpc</code> client library</li>
+</ul>
+
+<p>The lhc examples below are run against a YAWS REST server demo store. You can
+download and run the &ldquo;store&rdquo; yourself when you
+<a href="https://github.com/lfex/yaws-rest-starter">clone the repo</a>.</p>
+
+<p>For <code class="prettyprint">POST</code>ing data, we use the <a href="https://github.com/lfex/ljson">ljson</a> LFE
+library. To make this available to your project, simply add it to your
+<code class="prettyprint">rebar.config</code> file, per the instructions on the ljson project README.</p>
+
+<h2 id="start"><code class="prettyprint">start</code></h2>
+
+<blockquote>
+<p>It is required to start lhc before using the API:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:start)
+(#(inets ok) #(ssl ok) #(lhttpc ok) #(lhc ok))
+</code></pre>
+
+<blockquote>
+<p>If you attempt to use the API without having first started it,
+you will see errors like the following:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:get "http://localhost:8000/demos/store3/orders")
+#(error
+  #(exit
+    #(noproc
+      #(gen_server call
+        (undefined #(socket &lt;0.35.0&gt; "google.com" 80 false) infinity)))
+    (#(lhttpc_manager ensure_call 6
+       (#(file "src/lhttpc_manager.erl") #(line 234)))
+     #(lhttpc_client execute 9 (#(file "src/lhttpc_client.erl") #(line 158)))
+     #(lhttpc_client request 9 (#(file "src/lhttpc_client.erl") #(line 99)))
+     #(proc_lib init_p_do_apply 3 (#(file "proc_lib.erl") #(line 239))))))
+</code></pre>
+
+<p>This function simply starts the lhc LFE HTTP client. This is required for any
+use of the lhc client library.</p>
+
+<aside class="danger">
+If you do not start lhc, calling the API functions will result in errors.
+
+lhc depends upon other applications which need to be started (e.g., the
+Erlang networking services, SSL support, etc.)
+</aside>
+
+<h2 id="get"><code class="prettyprint">get</code></h2>
+
+<blockquote>
+<p>Perform a simple <code class="prettyprint">GET</code>:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:get "http://localhost:8000/demos/store3/orders")
+"{\"result\": \"You got a list of orders.\"}"
+&gt;
+</code></pre>
+
+<ul>
+<li><code class="prettyprint">lhc:get/1</code> - takes a URL</li>
+<li><code class="prettyprint">lhc:get/2</code> - takes a URL and lhc options</li>
+<li><code class="prettyprint">lhc:get/3</code> - takes a URL, list of headers, and lhc options</li>
+</ul>
+
+<p>Depending upon the <code class="prettyprint">return</code> option (default being <code class="prettyprint">body</code>) and  <code class="prettyprint">callback</code>
+option, each of these will return a parsed result iof the content obtained by
+<code class="prettyprint">lhttpc</code>.</p>
+
+<h2 id="head"><code class="prettyprint">head</code></h2>
+
+<blockquote>
+<p>To just get the headers from the server:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:head "http://localhost:8000/demos/store3/")
+(#("Content-Type" "application/json")
+ #("Date" "Thu, 27 Aug 2015 14:39:31 GMT")
+ #("Server" "Yaws 2.0"))
+&gt;
+</code></pre>
+
+<ul>
+<li><code class="prettyprint">lhc:head/1</code> - takes a URL</li>
+<li><code class="prettyprint">lhc:head/2</code> - takes a URL and lhc options</li>
+<li><code class="prettyprint">lhc:head/3</code> - takes a URL, list of headers, and lhc options</li>
+</ul>
+
+<p>Returns just the parsed headers of the result from <code class="prettyprint">lhttpc</code>. By defualt, this
+is a list of tuples, each being a key/value pair of header name and head value.</p>
+
+<h2 id="post"><code class="prettyprint">post</code></h2>
+
+<blockquote>
+<p>To <code class="prettyprint">POST</code>, we first create a payload. The demo REST API we&rsquo;re testing against
+can take any string value, but many applications will expect JSON data. Let&rsquo;s
+use JSON here:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (set payload (ljson:encode '(#(make #"Volvo") #(model #"P1800"))))
+#"{"make":"Volvo","model":"P1800"}"
+&gt;
+</code></pre>
+
+<blockquote>
+<p>With our payload in hand, we can now <code class="prettyprint">POST</code> to create a new order:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:post "http://localhost:8000/demos/store3/order" payload)
+"{\"result\": \"{\"order-id\": 124}\"}"
+&gt;
+</code></pre>
+
+<ul>
+<li><code class="prettyprint">lhc:post/1</code> - takes a URL, making an empty data <code class="prettyprint">POST</code></li>
+<li><code class="prettyprint">lhc:post/2</code> - takes a URL and <code class="prettyprint">POST</code> data</li>
+<li><code class="prettyprint">lhc:post/3</code> - takes a URL, <code class="prettyprint">POST</code> data, and lhc options</li>
+<li><code class="prettyprint">lhc:post/4</code> - takes a URL, <code class="prettyprint">POST</code> data, a list of headers, and lhc
+options</li>
+</ul>
+
+<h2 id="put"><code class="prettyprint">put</code></h2>
+
+<blockquote>
+<p>To <code class="prettyprint">PUT</code>, we first create a payload similar to what we did for <code class="prettyprint">POST</code> but
+with the modified data we want:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (set payload (ljson:encode '(#(make #"Volvo") #(model #"2015 P1800"))))
+#"{"make":"Volvo","model":"2015 P1800"}"
+&gt;
+</code></pre>
+
+<blockquote>
+<p>We can now <code class="prettyprint">PUT</code> to update our order:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:put "http://localhost:8000/demos/store3/order/124" payload)
+"{\"result\": \"You updated all of order 124.\"}"
+&gt;
+</code></pre>
+
+<ul>
+<li><code class="prettyprint">lhc:put/1</code> - takes a URL, making an empty data <code class="prettyprint">PUT</code></li>
+<li><code class="prettyprint">lhc:put/2</code> - takes a URL and <code class="prettyprint">PUT</code> data</li>
+<li><code class="prettyprint">lhc:put/3</code> - takes a URL, <code class="prettyprint">PUT</code> data, and lhc options</li>
+<li><code class="prettyprint">lhc:put/4</code> - takes a URL, <code class="prettyprint">PUT</code> data, a list of headers, and lhc
+options</li>
+</ul>
+
+<h2 id="delete"><code class="prettyprint">delete</code></h2>
+
+<blockquote>
+<p><code class="prettyprint">DELETE</code>ing is as simple as passing the appropriate URL:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:delete "http://localhost:8000/demos/store3/order/124")
+"{\"result\": \"You deleted order 124.\"}"
+&gt;
+</code></pre>
+
+<ul>
+<li><code class="prettyprint">lhc:delete/1</code> - takes a URL</li>
+<li><code class="prettyprint">lhc:delete/2</code> - takes a URL and lhc options</li>
+<li><code class="prettyprint">lhc:delete/3</code> - takes a URL, list of headers, and lhc options</li>
+</ul>
+
+<h2 id="trace"><code class="prettyprint">trace</code></h2>
+
+<p>Note that <code class="prettyprint">TRACE</code> isn&rsquo;t implemented in YAWS so we don&rsquo;t have example code to
+share. Likewise, <code class="prettyprint">lhc:trace</code> is untested against a server implementing
+<code class="prettyprint">TRACE</code> &ndash; please
+<a href="https://github.com/lfex/lhc/issues/new">let us know</a>
+if you run into usage problems with this function.</p>
+
+<ul>
+<li><code class="prettyprint">lhc:trace/1</code> - takes a URL</li>
+<li><code class="prettyprint">lhc:trace/2</code> - takes a URL and data</li>
+<li><code class="prettyprint">lhc:trace/3</code> - takes a URL, data, and lhc options</li>
+<li><code class="prettyprint">lhc:trace/4</code> - takes a URL, data, a list of headers, and lhc options</li>
+</ul>
+
+<h2 id="options"><code class="prettyprint">options</code></h2>
+
+<blockquote>
+<p>lhc provides support for requesting the allowed methods for a given URL:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:options "http://localhost:8000/demos/store3/order/124")
+"{\"result\": \"You got the allowed method for order/124: GET, PUT, POST, DELETE, and OPTIONS.\"}"
+</code></pre>
+
+<ul>
+<li><code class="prettyprint">lhc:options/1</code> - takes a URL</li>
+<li><code class="prettyprint">lhc:options/2</code> - takes a URL and lhc options</li>
+<li><code class="prettyprint">lhc:options/3</code> - takes a URL, list of headers, and lhc options</li>
+</ul>
+
+<h2 id="connect"><code class="prettyprint">connect</code></h2>
+
+<p>TBD</p>
+
+<p>(Note that this HTTP verb is not supported by YAWS, so we&rsquo;ll likely save it for
+very last.)</p>
+
+<h2 id="patch"><code class="prettyprint">patch</code></h2>
+
+<blockquote>
+<p>Let&rsquo;s define the partial data we want to send:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (set payload (ljson:encode '(#(model #"2015 P1800"))))
+#"{"model":"2015 P1800"}"
+&gt;
+</code></pre>
+
+<blockquote>
+<p>We can now <code class="prettyprint">PATCH</code> our order, updating only the part that we wanted to
+change:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:patch "http://localhost:8000/demos/store3/order/124" payload)
+"{\"result\": \"You updated part of order 124.\"}"
+&gt;
+</code></pre>
+
+<p><code class="prettyprint">PATCH</code> is useful for large data sets where you only one a part of the data
+updated. You can use <code class="prettyprint">PATCH</code> to update just the bits you&rsquo;re interested in,
+without having to send the entire payload like is recommended with <code class="prettyprint">PUT</code>.</p>
+
+<ul>
+<li><code class="prettyprint">lhc:patch/1</code> - takes a URL, making an empty data <code class="prettyprint">PATCH</code></li>
+<li><code class="prettyprint">lhc:patch/2</code> - takes a URL and <code class="prettyprint">PATCH</code> data</li>
+<li><code class="prettyprint">lhc:patch/3</code> - takes a URL, <code class="prettyprint">PATCH</code> data, and lhc options</li>
+<li><code class="prettyprint">lhc:patch/4</code> - takes a URL, <code class="prettyprint">PATCH</code> data, a list of headers, and lhc
+options</li>
+</ul>
+
+<h2 id="request"><code class="prettyprint">request</code></h2>
+
+<p>[Code ready, need docs]</p>
+
+<h2 id="parse-results"><code class="prettyprint">parse-results</code></h2>
+
+<p>[Code ready, need docs]</p>
+
+<h1 id="custom-results-parsing">Custom Results Parsing</h1>
+
+<p>[Code ready, need docs]</p>
+
+<h1 id="from-erlang">From Erlang</h1>
+
+<blockquote>
+<p>Basic usage from Erlang is straight-forward:</p>
+</blockquote>
+<pre class="highlight erlang"><code><span class="mi">1</span><span class="o">&gt;</span> <span class="nn">lhc</span><span class="p">:</span><span class="nf">start</span><span class="p">().</span>
+<span class="p">[{</span><span class="n">inets</span><span class="p">,</span><span class="n">ok</span><span class="p">},{</span><span class="n">ssl</span><span class="p">,</span><span class="n">ok</span><span class="p">},{</span><span class="n">lhttpc</span><span class="p">,</span><span class="n">ok</span><span class="p">},{</span><span class="n">lhc</span><span class="p">,</span><span class="n">ok</span><span class="p">}]</span>
+<span class="mi">2</span><span class="o">&gt;</span> <span class="nn">lhc</span><span class="p">:</span><span class="nb">get</span><span class="p">(</span><span class="s">"http://localhost:8000/demos/store3/orders"</span><span class="p">).</span>
+<span class="s">"{</span><span class="se">\"</span><span class="s">result</span><span class="se">\"</span><span class="s">: </span><span class="se">\"</span><span class="s">You got a list of orders.</span><span class="se">\"</span><span class="s">}"</span>
+<span class="mi">3</span><span class="o">&gt;</span> <span class="nv">Payload</span> <span class="o">=</span> <span class="nn">ljson</span><span class="p">:</span><span class="nf">encode</span><span class="p">([{</span><span class="n">make</span><span class="p">,</span><span class="o">&lt;&lt;</span><span class="s">"Volvo"</span><span class="o">&gt;&gt;</span><span class="p">},{</span><span class="n">model</span><span class="p">,</span><span class="o">&lt;&lt;</span><span class="s">"P1800"</span><span class="o">&gt;&gt;</span><span class="p">}]).</span>
+<span class="o">&lt;&lt;</span><span class="s">"{</span><span class="se">\"</span><span class="s">make</span><span class="se">\"</span><span class="s">:</span><span class="se">\"</span><span class="s">Volvo</span><span class="se">\"</span><span class="s">,</span><span class="se">\"</span><span class="s">model</span><span class="se">\"</span><span class="s">:</span><span class="se">\"</span><span class="s">P1800</span><span class="se">\"</span><span class="s">}"</span><span class="o">&gt;&gt;</span>
+<span class="mi">4</span><span class="o">&gt;</span> <span class="nn">lhc</span><span class="p">:</span><span class="nf">post</span><span class="p">(</span><span class="s">"http://localhost:8000/demos/store3/order"</span><span class="p">,</span> <span class="nv">Payload</span><span class="p">).</span>
+<span class="s">"{</span><span class="se">\"</span><span class="s">result</span><span class="se">\"</span><span class="s">: </span><span class="se">\"</span><span class="s">{</span><span class="se">\"</span><span class="s">order-id</span><span class="se">\"</span><span class="s">: 124}</span><span class="se">\"</span><span class="s">}"</span>
+</code></pre>
+
+<p>Using lhc from Erlang is very straight-forward; there aren&rsquo;t even hypens in
+most module or function names, so no need to escape any atoms!</p>
+
+<p>Why would you want to, you ask? Well, it might be convenient to use a library
+that offers consistent usage patterns (and function calls) across a selection
+of HTTP clients in the Erlang ecosystem. You and your developers could write
+your HTTP code once, and then change backend clients as the needs arose,
+without having to change any code (just some small configuration settings).</p>
+
+<p>Take a look at the sample usage to the right to get a sense of using lhc from
+Erlang.</p>
+
+          <h1 id="backends">Backends</h1>
+
+<p>lhc supports a handfule of backends, with more future ones planned.</p>
+
+<p>Current backends are:</p>
+
+<ul>
+<li><a href="http://erlang.org/doc/man/httpc.html">httpc</a></li>
+<li><a href="http://github.com/billosys/lhttpc">lhttpc</a></li>
+<li><a href="https://github.com/ferd/dlhttpc">dlhttpc</a></li>
+<li><a href="https://github.com/benoitc/hackney">hackney</a></li>
+<li><a href="https://github.com/cmullaparthi/ibrowse">ibrowse</a></li>
+</ul>
+
+<p>Planned backends currently include the following:</p>
+
+<ul>
+<li><a href="https://github.com/inaka/shotgun">shotgun</a></li>
+<li><a href="https://github.com/esl/fusco">fusco</a></li>
+</ul>
+
+<h2 id="selecting">Selecting</h2>
+
+<blockquote>
+<p>Edit the backend value in the <code class="prettyprint">lhc</code> section of your <code class="prettyprint">lfe.config</code> file.
+See the lhc <code class="prettyprint">lfe.config</code> for an example of this. Once edited, running
+<code class="prettyprint">start</code> will use that value:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:start)
+(#(inets ok) #(ssl ok) #(lhttpc ok) #(lhc ok))
+&gt; (lhc:get-backend)
+lhttpc
+&gt;
+</code></pre>
+
+<blockquote>
+<p>You can also start lhc with your preferred backend:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:start 'httpc)
+(#(inets ok) #(ssl ok) #(lhc ok))
+&gt;
+</code></pre>
+
+<blockquote>
+<p>You can change backends at any time:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:change-backend 'lhttpc)
+(#(backend #(previous httpc) #(current lhttpc)))
+&gt;
+</code></pre>
+
+<p>Bakends my be selected one of three ways:</p>
+
+<ul>
+<li>setting the <code class="prettyprint">backend</code> value in the <code class="prettyprint">lhc</code> section of the <code class="prettyprint">lfe.config</code>
+file</li>
+<li>Starting lhc with a particular bacend.</li>
+<li>Changing the backend after lhc has been started.</li>
+</ul>
+
+<aside class="danger">
+If you wish to use a backend, you <strong>must</strong> have the desired HTTP
+client library installed, as well as all of its dependencies. Attempting to
+start a backend that hasn&rsquo;t been installed (or whose libraries are not present
+in <code>ERL_LIBS</code>) will result in errors upon startup.
+</aside>
+
+<h2 id="backend-information">Backend Information</h2>
+
+<blockquote>
+<p>Find out which backend you are using:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:get-backend)
+lhttpc
+&gt;
+</code></pre>
+
+<blockquote>
+<p>Find out which backend is configured in your <code class="prettyprint">lfe.config</code> file:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:get-backend-cfg)
+lhttpc
+</code></pre>
+
+<blockquote>
+<p>Find out which module holds the backend functions:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>&gt; (lhc:get-backend-module)
+lhc-backend
+</code></pre>
+
+<p>Several convenience functions are provided in support of lhc backends.</p>
+
+<p>See examples to the right.</p>
+
+          <h1 id="user-agent">User Agent</h1>
+
+<blockquote>
+<p>The lhc user agent string:</p>
+</blockquote>
+<pre class="highlight plaintext"><code>"LFE Little HTTP Client/0.1.0 (LFE 0.10.0-dev; Erlang 18; backend=lhttpc) (+http://github.com/lfex/lhc)"
+</code></pre>
+
+<p>The lhc user agent will show up in any HTTP server log files where client user
+agent strings are recorded. To the right is an example of the lhc user agent
+string.</p>
+
+          <h1 id="previous-versions">Previous Versions</h1>
+
+<p>Documentation is available for all previous releases:</p>
+
+<ul>
+<li><a href="../current/">Development version</a></li>
+<li><a href="../v0.1.0/">v0.1.0</a></li>
+</ul>
+
+          <h1 id="license">License</h1>
+
+<p>Copyright &copy; 2014-2015 Duncan McGreggor <a href="mailto:oubiwann@gmail.com">oubiwann@gmail.com</a></p>
+
+<p>Licensed under the Apache License, Version 2.0 (the &ldquo;License&rdquo;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+
+<ul>
+<li>http://www.apache.org/licenses/LICENSE-2.0</li>
+</ul>
+
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &ldquo;AS IS&rdquo; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+
+      </div>
+      <div class="dark-box">
+          <div class="lang-selector">
+                <a href="#" data-language-name=""></a>
+          </div>
+      </div>
+    </div>
+  </body>
+</html>
