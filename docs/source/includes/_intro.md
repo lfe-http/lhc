@@ -4,7 +4,7 @@
 
 <a href="images/lhc.jpg"><img src="images/lhc-small.jpg" /></a>
 
-This library is meant to be a dead-simple HTTP client for LFE projects. That's all there is to it. It uses lhttpc under the hood, which can be a little cumbersome for those new to Erlang when used directly; as such, lhc will likely provide a welcome alternative.
+[lhc](http://github.com/lfex/lhc) is library is meant to be a dead-simple HTTP client for LFE projects. That's all there is to it. It uses lhttpc under the hood, which can be a little cumbersome for those new to Erlang when used directly; as such, lhc will likely provide a welcome alternative.
 
 <aside class="success">
 The following API functions are ready to use:
