@@ -13,4 +13,3 @@ logs/*
 docs/Gemfile.lock
 docs/build
 docs/master/current
-docs/master/v0.1.0
