@@ -93,25 +93,8 @@ compile-no-deps: clean-ebin
 clean: clean-ebin clean-eunit
 	@$(REBAR) clean
 
-check-unit-only: clean-eunit
-	@PATH=$(SCRIPT_PATH) $(LFETOOL) tests unit
-
-check-integration-only: clean-eunit
-	@PATH=$(SCRIPT_PATH) $(LFETOOL) tests integration
-
-check-system-only: clean-eunit
-	@PATH=$(SCRIPT_PATH) $(LFETOOL) tests system
-
-check-unit-with-deps: compile compile-tests check-unit-only
-check-unit: compile-no-deps check-unit-only
-check-integration: compile check-integration-only
-check-system: compile check-system-only
-check-all-with-deps: compile check-unit-only check-integration-only \
-	check-system-only
-check-all: compile-no-deps clean-eunit
-	@PATH=$(SCRIPT_PATH) $(LFETOOL) tests all
-
-check: check-unit-with-deps
+check:
+	@rebar3 eunit -v
 
 check-travis: compile compile-tests check-unit-only
 
