@@ -2,7 +2,7 @@
 title: lhc - LFE Little HTTP Client library
 
 language_tabs:
-  - 
+  -
 
 toc_footers:
   - <a href='http://github.com/lfex/lhc/'>View the source</a>
@@ -11,6 +11,7 @@ toc_footers:
 includes:
   - intro
   - api
+  - url
   - backends
   - misc
   - versions
