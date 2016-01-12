@@ -87,6 +87,202 @@
   (is-equal "c=3&d=4" (lhc-url:->qstring (test-url-2)))
   (is-equal "e=5&f=6&g=7" (lhc-url:->qstring (test-url-3))))
 
+(deftest parse-host
+  (let* ((url-str "http://example.com")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))))
+
+(deftest parse-host-port
+  (let* ((url-str "http://example.com:5099")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com"(lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))))
+
+(deftest parse-user-host
+  (let* ((url-str "http://alice@example.com")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "alice" (lhc-url:get-username url))))
+
+(deftest parse-user-pass-host-port
+  (let* ((url-str "http://alice:secret@example.com:5099")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "secret" (lhc-url:get-password url))))
+
+(deftest parse-all
+  (let* ((url-str "http://alice:sekrit@example.com:5099/a/b/c?q=lfe#toc")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "q=lfe" (lhc-url:get-query url))
+    (is-equal "#toc" (lhc-url:get-fragment url))))
+
+(deftest parse-no-user-password
+  (let* ((url-str "http://example.com:5099/a/b/c?q=lfe#toc")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "q=lfe" (lhc-url:get-query url))
+    (is-equal "#toc" (lhc-url:get-fragment url))))
+
+(deftest parse-no-user-password-short-query
+  (let* ((url-str "http://example.com:5099/a/b/c?#toc")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "#toc" (lhc-url:get-fragment url))))
+
+(deftest parse-no-user-password-short-query-frag
+  (let* ((url-str "http://example.com:5099/a/b/c?#")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "#" (lhc-url:get-fragment url))))
+
+(deftest parse-all-short-query
+  (let* ((url-str "http://alice:sekrit@example.com:5099/a/b/c?#toc")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "#toc" (lhc-url:get-fragment url))))
+
+(deftest parse-all-short-query-frag
+  (let* ((url-str "http://alice:sekrit@example.com:5099/a/b/c?#")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "#" (lhc-url:get-fragment url))))
+
+(deftest parse-all-short-path-query-frag
+  (let* ((url-str "http://alice:sekrit@example.com:5099/?#")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "/" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "#" (lhc-url:get-fragment url))))
+
+(deftest parse-no-path-short-query-frag
+  (let* ((url-str "http://alice:sekrit@example.com:5099?#")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "#" (lhc-url:get-fragment url))))
+
+(deftest parse-no-path-port-short-query-frag
+  (let* ((url-str "http://alice:sekrit@example.com?#")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "#" (lhc-url:get-fragment url))))
+
+(deftest parse-no-query
+  (let* ((url-str "http://alice:sekrit@example.com:5099/a/b/c#toc")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "#toc" (lhc-url:get-fragment url))))
+
+(deftest parse-no-frag
+  (let* ((url-str "http://alice:sekrit@example.com:5099/a/b/c?")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "" (lhc-url:get-fragment url))))
+
+(deftest parse-no-frag-query
+  (let* ((url-str "http://alice:sekrit@example.com:5099/a/b/c")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "5099" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "" (lhc-url:get-fragment url))))
+
+(deftest parse-no-frag-query-port
+  (let* ((url-str "http://alice:sekrit@example.com/a/b/c")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "" (lhc-url:get-port url))
+    (is-equal "alice" (lhc-url:get-username url))
+    (is-equal "sekrit" (lhc-url:get-password url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "" (lhc-url:get-fragment url))))
+
+(deftest parse-scheme-host-path
+  (let* ((url-str "http://example.com/a/b/c")
+         (url (lhc-url:parse url-str)))
+    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "example.com" (lhc-url:get-host url))
+    (is-equal "" (lhc-url:get-port url))
+    (is-equal "" (lhc-url:get-username url))
+    (is-equal "" (lhc-url:get-password url))
+    (is-equal "/a/b/c" (lhc-url:get-path url))
+    (is-equal "" (lhc-url:get-query url))
+    (is-equal "" (lhc-url:get-fragment url))))
+
+(deftest parse-error
+  (let* ((url-str ":::")
+         (url (lhc-url:parse url-str)))
+    (is-equal #(error unparsable-string) url)))
+
 ;;; Test support functions
 
 (deftest parse-netloc-host

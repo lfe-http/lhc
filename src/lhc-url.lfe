@@ -6,8 +6,26 @@
 
 ;;; Constants
 
-(defun netloc-regex () "(([^:]+)(:([^:@]+))?@)?([^:@]+)(:([^:]+))?")
+(defun user-regex () "([^:]+)")
+(defun pass-regex () "([^:@]+)")
+(defun user-pass-regex () (++ "(" (user-regex) "(:" (pass-regex) ")?@)?"))
+(defun host-regex () "([^:@/#?]+)")
+(defun port-regex () "([^:/#?]+)")
+(defun host-port-regex () (++ (host-regex) "(:" (port-regex) ")?"))
+(defun netloc-regex () (++ (user-pass-regex) (host-port-regex)))
 (defun netloc-regex-opts () '(global #(capture (2 4 5 7) list)))
+
+(defun scheme-regex () "([^:]+)://")
+(defun path-regex () "(/[^?#]*)?")
+(defun query-regex () "(\\?([^#]*))?")
+(defun fragment-regex () "(#.*)?")
+(defun url-regex ()
+  (++ (scheme-regex)
+      (netloc-regex)
+      (path-regex)
+      (query-regex)
+      (fragment-regex)))
+(defun url-regex-opts () '(global #(capture (1 3 5 6 8 9 11 12) list)))
 
 ;;; Constructors
 
@@ -120,6 +138,25 @@
       #(error unsupported-type)))
   ((_)
     #(error unsupported-type)))
+
+(defun parse (url-str)
+  (parse url-str '()))
+
+(defun parse (url-str opts)
+  (case (re:run url-str (url-regex) (url-regex-opts))
+    (`#(match ((,scheme ,user ,pass ,host ,port ,path ,query ,fragment)))
+      (make-urldata
+        scheme scheme
+        netloc (make-netloc
+                 username user
+                 password pass
+                 host host
+                 port port)
+        path path
+        query query
+        fragment fragment))
+    ('nomatch
+      #(error unparsable-string))))
 
 ;;; Support functions
 
