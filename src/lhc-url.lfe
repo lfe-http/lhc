@@ -1,6 +1,7 @@
 (defmodule lhc-url
   (export all))
 
+(include-lib "clj/include/predicates.lfe")
 (include-lib "lhc/include/lhc-records.lfe")
 
 ;;; Constants
@@ -103,6 +104,23 @@
 (defun decode (path encoding)
   'noop)
 
+(defun ->url ()
+  'noop)
+
+(defun ->qstring
+  ((term) (when (is_map term))
+    (map->qstring term))
+  ((term) (when (is_list term))
+    (if (proplist? term)
+        (plist->qstring term)
+        #(error unsupported-type)))
+  ((term) (when (is_tuple term))
+    (if (is_record term 'urldata)
+      (->qstring (urldata-query term))
+      #(error unsupported-type)))
+  ((_)
+    #(error unsupported-type)))
+
 ;;; Support functions
 
 (defun parse-netloc (netloc-str)
@@ -110,4 +128,26 @@
     (`#(match ((,user ,pass ,host ,port)))
       (make-netloc username user password pass host host port port))
     ('nomatch
-      (make-netloc))))
+      #(error unparsable-string))))
+
+(defun plist->qstring (plist-data)
+  (lists:flatten
+    (lists:foldl
+      (match-lambda
+        ((`#(,k ,v) acc)
+          (get-query-pair k v acc)))
+      ""
+      plist-data)))
+
+(defun map->qstring (map-data)
+  (lists:flatten
+    (maps:fold #'get-query-pair/3 "" map-data)))
+
+(defun get-query-pair
+  ((k v "")
+    (format-pair k v))
+  ((k v acc)
+    (++ acc "&" (format-pair k v))))
+
+(defun format-pair (k v)
+  (io_lib:format "~p=~p" `(,k ,v)))
