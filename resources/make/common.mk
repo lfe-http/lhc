@@ -27,6 +27,14 @@ RELEASE_DIR = ./release
 RELX_CFG = $(RELEASE_DIR)/relx.config
 ERL_LIBS = $(shell pwd):$(shell $(LFETOOL) info erllibs)
 
+compile: clean-ebin
+	@echo "Compiling project code and dependencies ..."
+	@$(REBAR) compile
+
+compile-no-deps: clean-ebin
+	@echo "Compiling only project code ..."
+	@$(REBAR) compile skip_deps=true
+
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)
 
@@ -81,14 +89,6 @@ shell-no-deps: compile-no-deps
 	@which clear >/dev/null 2>&1 && clear || printf "\033c"
 	@echo "Starting an Erlang shell ..."
 	@erl +pc unicode
-
-compile: clean-ebin
-	@echo "Compiling project code and dependencies ..."
-	@$(REBAR) compile
-
-compile-no-deps: clean-ebin
-	@echo "Compiling only project code ..."
-	@$(REBAR) compile skip_deps=true
 
 clean: clean-ebin clean-eunit
 	@$(REBAR) clean
