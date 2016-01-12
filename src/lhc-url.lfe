@@ -27,6 +27,13 @@
       (fragment-regex)))
 (defun url-regex-opts () '(global #(capture (1 3 5 6 8 9 11 12) list)))
 
+(defun rfc1738-safe () "$-_.+!*'(),:/")
+(defun rfc3986-safe ()
+  (++ "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+      "abcdefghijklmnopqrstuvwxyz"
+      "0123456789"
+      "_.-~"))
+
 ;;; Constructors
 
 (defun new ()
@@ -113,8 +120,23 @@
 
 ;;; Utility functions
 
-(defun encode ()
-  'noop)
+(defun encode (chars)
+  (encode chars (++ (rfc3986-safe) (rfc1738-safe))))
+
+(defun encode
+  ;; This was translated from yaws_api:url_encode, with changes.
+  (('() _)
+    '())
+  (((cons head tail) safe) (when (is_list head))
+    (cons (encode head safe) (encode tail safe)))
+  (((cons head tail) safe)
+    (if (lists:member head safe)
+      (cons head (encode tail safe))
+      (case (erlang:integer_to_list head 16)
+        (`(,x ,y)
+          `(#\% ,x ,y . ,(encode tail safe)))
+        (`(,x)
+          `(#\% #\0 ,x . ,(encode tail safe)))))))
 
 (defun decode (path)
   (decode path (file:native_name_encoding)))

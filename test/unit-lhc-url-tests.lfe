@@ -29,6 +29,9 @@
                  #(query ,(test-query-2))
                  #(fragment "#toc"))))
 
+(defun safe-chars () (++ (lhc-url:rfc3986-safe) (lhc-url:rfc1738-safe)))
+(defun rfc1738-unsafe () "<>\"#%{}|\\^[]")
+
 ;;; Test constructors
 
 (deftest new-0
@@ -79,6 +82,13 @@
     (is-equal "#toc" expected)))
 
 ;;; Test utility functions
+
+(deftest encode-safe
+ (is-equal (lhc-url:encode (safe-chars)) (safe-chars)))
+
+(deftest encode-unsafe
+ (is-equal (lhc-url:encode (rfc1738-unsafe))
+           "%3C%3E%22%23%25%7B%7D%7C%5C%5E%5B%5D"))
 
 (deftest ->string
   (is-equal "c=3&d=4" (lhc-url:->qstring (test-query-1)))
