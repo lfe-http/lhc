@@ -1,16 +1,16 @@
 %% -*- erlang -*-
-{application, 'lhc',
+{application, lhc,
  [
   %% A quick description of the application.
   {description, "LFE Little HTTP Client"},
 
   %% The version of the application
-  {vsn, "0.2.1"},
+  {vsn, "0.3.0"},
 
   %% All modules used by the application.
   {modules,
    [
-    'lhc'
+    lhc
    ]},
 
   %% All of the registered names the application uses. This can be ignored.
