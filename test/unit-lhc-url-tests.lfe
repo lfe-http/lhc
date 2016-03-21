@@ -8,7 +8,8 @@
 ;;; Test Data
 
 (defun test-query-1 () '(#(c 3) #(d 4)))
-(defun test-query-2 () #m(e 5 f 6 g 7))
+;;(defun test-query-2 () #m(e 5 f 6 g 7))
+(defun test-query-2 () '(#(e 5) #(f 6) #(g 7)))
 (defun test-url-1 () (lhc-url:new))
 (defun test-url-2 ()
   (lhc-url:new `(#(scheme "proto")
@@ -84,11 +85,18 @@
 ;;; Test utility functions
 
 (deftest encode-safe
- (is-equal (lhc-url:encode (safe-chars)) (safe-chars)))
+ (is-equal (safe-chars) (lhc-url:encode (safe-chars))))
 
-(deftest encode-unsafe
- (is-equal (lhc-url:encode (rfc1738-unsafe))
-           "%3C%3E%22%23%25%7B%7D%7C%5C%5E%5B%5D"))
+; (deftest encode-unsafe
+;  (is-equal "%3C%3E%22%23%25%7B%7D%7C%5C%5E%5B%5D"
+;            (lhc-url:encode (rfc1738-unsafe))))
+
+; (deftest encode
+;   (is-equal "/simple/path" (lhc-url:encode "/simple/path"))
+;   (is-equal "" (lhc-url:encode "/path with spaces"))
+;   (is-equal "" (lhc-url:encode "/path/with/@"))
+;   (is-equal "" (lhc-url:encode "/path/with/+"))
+;   (is-equal "" (lhc-url:encode "/path/with/Ůŋîçøðé")))
 
 (deftest ->string
   (is-equal "c=3&d=4" (lhc-url:->qstring (test-query-1)))
@@ -106,7 +114,7 @@
 (deftest parse-host-port
   (let* ((url-str "http://example.com:5099")
          (url (lhc-url:parse url-str)))
-    (is-equal "http"(lhc-url:get-scheme url))
+    (is-equal "http" (lhc-url:get-scheme url))
     (is-equal "example.com"(lhc-url:get-host url))
     (is-equal "5099" (lhc-url:get-port url))))
 

@@ -127,8 +127,9 @@
 (defun encode (chars)
   (encode chars (++ (rfc3986-safe) (rfc1738-safe))))
 
+;; XXX add support for encoding non-ASCII characters using UTF-8
 (defun encode
-  ;; This was translated from yaws_api:url_encode, with changes.
+  ;; This was translated from yaws_api:url_encode ... with significant changes.
   (('() _)
     '())
   (((cons head tail) safe) (when (is_list head))
@@ -136,7 +137,7 @@
   (((cons head tail) safe)
     (if (lists:member head safe)
       (cons head (encode tail safe))
-      (case (erlang:integer_to_list head 16)
+      (case (lhc-util:utf8-encode head #(hex))
         (`(,x ,y)
           `(#\% ,x ,y . ,(encode tail safe)))
         (`(,x)
@@ -152,8 +153,6 @@
   'noop)
 
 (defun ->qstring
-  ((term) (when (is_map term))
-    (map->qstring term))
   ((term) (when (is_list term))
     (if (proplist? term)
         (plist->qstring term)
@@ -162,8 +161,12 @@
     (if (is_record term 'urldata)
       (->qstring (urldata-query term))
       #(error unsupported-type)))
-  ((_)
-    #(error unsupported-type)))
+  ((term)
+    (cond
+;;      ((andalso (call 'erlang 'is_map term))
+;;        (map->qstring term))
+      ('true
+        #(error unsupported-type)))))
 
 (defun parse (url-str)
   (parse url-str '()))
