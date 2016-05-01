@@ -1,11 +1,11 @@
-# lhc
+# lhc [![Build Status][travis-badge]][travis]
+
+[![LHC project logo][logo]][logo-large]
 
 *Little (LFE) HTTP Client -- A light-weight LFE wrapper around lhttpc*
 
-<a href="resources/images/lhc.jpg"><img src="resources/images/lhc-small.jpg" /></a>
 
-
-#### Table of Contents
+#### Contents
 
 * [Introduction](#introduction-)
 * [Dependencies](#dependencies-)
@@ -14,7 +14,7 @@
 * [Backends](#backends-)
 
 
-## Introduction [&#x219F;](#table-of-contents)
+## Introduction [&#x219F;](#contents)
 
 This is simply meant to be a dead-simple HTTP client for LFE projects. That's
 all there is to it. It can use one of several possible HTTP clients under the hood. Some of those can can be a little cumbersome for those new to Erlang when used directly, so lhc can be quite helpful for them.
@@ -28,7 +28,7 @@ It no longer uses the old version of rebar. If you do not wish to use rebar3,
 you may use the most recent rebar2-compatible release of lhc: 0.1.0.
 
 
-## Installation [&#x219F;](#table-of-contents)
+## Installation [&#x219F;](#contents)
 
 Just add it to your ``rebar.config`` deps:
 
@@ -47,11 +47,19 @@ And then do the usual:
 ```
 
 
-## Usage [&#x219F;](#table-of-contents)
+## Usage [&#x219F;](#contents)
 
 Usage information is provided in the [documentation](http://lfex.github.io/lhc/).
 
 
-## Backends [&#x219F;](#table-of-contents)
+## Backends [&#x219F;](#contents)
 
 lhc is not an HTTP client in its own right, rather a wrapper for HTTP clients. These "backends" are selectable using a directive in the ``lfe.config`` file. For more information, see the [backend documentation](http://lfex.github.io/lhc/current/#backends).
+
+
+<!-- Named page links below: /-->
+
+[travis]: https://travis-ci.org/lfex/lhc
+[travis-badge]: https://travis-ci.org/lfex/lhc.png?branch=master
+[logo]: priv/images/lhc-small.jpg
+[logo-large]: priv/images/lhc.jpg
