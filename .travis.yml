@@ -1,13 +1,13 @@
 language: erlang
-before_install:
-  - wget https://s3.amazonaws.com/rebar3/rebar3
-  - chmod +x rebar3
-  - sudo mv rebar3 /usr/bin
-  - sudo echo "#!/usr/bin/env bash" > `which rebar`
-script:
-  - make check
+install: true
+before_script:
+    - wget https://s3.amazonaws.com/rebar3/rebar3
+    - chmod +x rebar3
+env: PATH=".:$PATH"
+script: make check
 otp_release:
-  - 18.2
+  - 18.3
+  - 18.0
   - 17.5
   - R16B03-1
   - R15B03
