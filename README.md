@@ -6,9 +6,9 @@
 [![Tags][github tags badge]][github tags]
 [![Downloads][hex downloads]][hex package]
 
-[![LHC project logo][logo]][logo-large]
-
 *Little (LFE) HTTP Client -- A light-weight LFE wrapper around lhttpc*
+
+[![LHC project logo][logo]][logo-large]
 
 
 #### Contents
@@ -40,17 +40,17 @@ you may use the most recent rebar2-compatible release of lhc: 0.1.0.
 Just add it to your `rebar.config` deps:
 
 ```erlang
-  {deps, [
-    ...
-    {lhc, ".*",
-      {git, "git@github.com:lfex/lhc.git", "master"}}
-      ]}.
+{deps, [
+...
+{lhc, ".*",
+  {git, "git@github.com:lfex/lhc.git", "master"}}
+  ]}.
 ```
 
 And then do the usual:
 
 ```bash
-    $ rebar compile
+$ rebar compile
 ```
 
 
