@@ -1,7 +1,7 @@
 (defmodule lhc-url
   (export all))
 
-(include-lib "clj/include/predicates.lfe")
+(include-lib "lfe/include/clj.lfe")
 (include-lib "lhc/include/lhc-records.lfe")
 
 ;;; Constants
@@ -154,7 +154,7 @@
 
 (defun ->qstring
   ((term) (when (is_list term))
-    (if (proplist? term)
+    (if (lhc-util:proplist? term)
         (plist->qstring term)
         #(error unsupported-type)))
   ((term) (when (is_tuple term))

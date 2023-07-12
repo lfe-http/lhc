@@ -41,3 +41,21 @@
 
 (defun utf8-decode (binary)
   (binary_to_list binary))
+
+;; TODO: Move to lutil-types.lfe
+(defun proplist?
+  ((data) (when (is_list data))
+    (if (lists:all #'proplist-kv?/1 data)
+      'true
+      'false))
+  ((_)
+    'false))
+
+;; TODO: Move to lutil-types.lfe
+(defun proplist-kv?
+  ((`#(,key ,_)) (when (is_atom key))
+    'true)
+  ((bool-key) (when (is_atom bool-key))
+    'true)
+  ((_)
+    'false))
