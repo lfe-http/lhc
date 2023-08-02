@@ -1,8 +1,8 @@
 # lhc
 
-[![Build Status][travis badge]][travis]
+[![Build Status][gh-actions-badge]][gh-actions]
 [![LFE Versions][lfe badge]][lfe]
-[![Erlang Versions][erlang badge]][versions]
+[![Erlang Versions][erlang badge]][version]
 [![Tags][github tags badge]][github tags]
 [![Downloads][hex downloads]][hex package]
 
@@ -83,12 +83,12 @@ Copyright (c) 2015-2016 Duncan McGreggor <oubiwann@gmail.com>
 [org]: https://github.com/lfex
 [github]: https://github.com/lfex/lhc
 [gitlab]: https://gitlab.com/lfex/lhc
-[travis]: https://travis-ci.org/lfex/lhc
-[travis badge]: https://img.shields.io/travis/lfex/lhc.svg
+[gh-actions-badge]: https://github.com/lfex/lhc/actions/workflows/cicd.yml/badge.svg
+[gh-actions]: https://github.com/lfex/lhc/actions
 [lfe]: https://github.com/rvirding/lfe
-[lfe badge]: https://img.shields.io/badge/lfe-1.2.0-blue.svg
-[erlang badge]: https://img.shields.io/badge/erlang-R15%20to%2019.1-blue.svg
-[versions]: https://github.com/lfex/lhc/blob/master/.travis.yml
+[lfe badge]: https://img.shields.io/badge/lfe-1.2.1-blue.svg
+[erlang badge]: https://img.shields.io/badge/erlang-19%20to%2026-blue.svg
+[version]: https://github.com/lfex/lhc/blob/master/.github/workflows/cicd.yml
 [github tags]: https://github.com/lfex/lhc/tags
 [github tags badge]: https://img.shields.io/github/tag/lfex/lhc.svg
 [github downloads]: https://img.shields.io/github/downloads/lfex/lhc/total.svg
