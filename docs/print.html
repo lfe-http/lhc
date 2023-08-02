@@ -1,0 +1,614 @@
+<!DOCTYPE HTML>
+<html lang="en" class="sidebar-visible no-js light">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>lhc</title>
+        <meta name="robots" content="noindex" />
+
+
+        <!-- Custom HTML head -->
+        
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff" />
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            var html = document.querySelector('html');
+            html.classList.remove('no-js')
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add('js');
+        </script>
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var html = document.querySelector('html');
+            var sidebar = null;
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <div class="sidebar-scrollbox">
+                <ol class="chapter"><li class="chapter-item expanded "><a href="intro.html"><strong aria-hidden="true">1.</strong> intro</a></li><li class="chapter-item expanded "><a href="api.html"><strong aria-hidden="true">2.</strong> api</a></li><li class="chapter-item expanded "><a href="url.html"><strong aria-hidden="true">3.</strong> url</a></li><li class="chapter-item expanded "><a href="backends.html"><strong aria-hidden="true">4.</strong> backends</a></li><li class="chapter-item expanded "><a href="misc.html"><strong aria-hidden="true">5.</strong> misc</a></li><li class="chapter-item expanded "><a href="versions.html"><strong aria-hidden="true">6.</strong> versions</a></li><li class="chapter-item expanded "><a href="license.html"><strong aria-hidden="true">7.</strong> license</a></li></ol>
+            </div>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle"></div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky bordered">
+                    <div class="left-buttons">
+                        <button id="sidebar-toggle" class="icon-button" type="button" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </button>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">lhc</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="introduction"><a class="header" href="#introduction">Introduction</a></h1>
+<p><em>Little (LFE) HTTP Client -- A light-weight LFE wrapper around lhttpc</em></p>
+<p><a href="images/lhc.jpg"><img src="images/lhc-small.jpg" /></a></p>
+<p><a href="http://github.com/lfex/lhc">lhc</a> is library is meant to be a dead-simple HTTP client for LFE projects. That's all there is to it. It uses lhttpc under the hood, which can be a little cumbersome for those new to Erlang when used directly; as such, lhc will likely provide a welcome alternative.</p>
+<aside class="success">
+The following API functions are ready to use:
+<ul>
+<li><code>get/1</code>, <code>get/2</code>, <code>get/3</code></li>
+<li><code>head/1</code>, <code>head/2</code>, <code>head/3</code></li>
+<li><code>post/1</code>, <code>post/2</code>, <code>post/3</code>, <code>post/4</code></li>
+<li><code>put/1</code>, <code>put/2</code>, <code>put/3</code>, <code>put/4</code></li>
+<li><code>delete/1</code>, <code>delete/2</code>, <code>delete/3</code></li>
+<li><code>trace/1</code>, <code>trace/2</code>, <code>trace/3</code>, <code>trace/4</code></li>
+<li><code>options/1</code>, <code>options/2</code>, <code>options/3</code></li>
+<li><code>patch/1</code>, <code>patch/2</code>, <code>patch/3</code>, <code>patch/4</code></li>
+<li><code>request/3</code>, <code>request/4</code>, <code>request/5</code>, <code>request/6</code>, <code>request/7</code></li>
+</ul>
+</aside>
+<aside class="caution">
+Note that the following have not been tested extensively (or possibly at all)
+against compliant servers:
+<ul>
+<li><code>trace/1</code>, <code>trace/2</code>, <code>trace/3</code>, <code>trace/4</code></li>
+</ul>
+</aside>
+<aside class="danger">
+Note that the following have not yet been implemented:
+<ul>
+<li>Functions for <code>CONNECT</code></li>
+</ul>
+</aside>
+<h1 id="dependencies"><a class="header" href="#dependencies">Dependencies</a></h1>
+<p>To use lhc, you need to have the following:</p>
+<ul>
+<li>Erlang</li>
+<li><code>rebar3</code></li>
+</ul>
+<p>Since version 0.2.0, the lhc library has moved to using <code>rebar3</code> and no longer supports the old version of rebar. If, for whatever reason, your project cannot use <code>rebar3</code>, you'll need to use version 0.1.0 of the lhc library.</p>
+<h1 id="installation"><a class="header" href="#installation">Installation</a></h1>
+<blockquote>
+<p>To use the <code>rebar3</code> LFE plugin, update your <code>rebar.config</code> file like the following:</p>
+</blockquote>
+<pre><code class="language-erlang">{plugins, [
+   {'lfe-compile', &quot;.*&quot;, {git, &quot;https://github.com/lfe-rebar3/compile.git&quot;, {tag, &quot;0.2.0&quot;}}}
+  ]}.
+{provider_hooks, [
+   {pre, [{compile, {lfe, compile}}]}
+  ]}.
+</code></pre>
+<blockquote>
+<p>Then update the <code>deps</code> directive in your <code>rebar.config</code> to pull down the latest lhc:</p>
+</blockquote>
+<pre><code class="language-erlang">{deps, [
+...
+{lhc, &quot;.*&quot;,
+  {git, &quot;git@github.com:lfex/lhc.git&quot;, &quot;0.2.0&quot;}}
+  ]}.
+</code></pre>
+<blockquote>
+<p>Once your project has added the lhc dependency, you're ready to  execute the <code>rebar3</code> command for compiling LFE projects:</p>
+</blockquote>
+<pre><code class="language-bash">$ rebar3 lfe compile
+</code></pre>
+<blockquote>
+<p>If you want to compile both LFE and any Erlang code you have in your project, you can do both with one command:</p>
+</blockquote>
+<pre><code class="language-bash">$ rebar3 compile
+</code></pre>
+<p>Since lhc now uses <code>rebar3</code>, you'll need to configure your project's <code>rebar.config</code> file to pull down the necessary <code>rebar3</code> plugins. A good example of this is the <a href="https://github.com/lfex/lcfg/blob/master/rebar.config">rebar.config file</a> for the lcfg project. In particular, you'll want to have the same <code>plugins</code> and <code>provider_hooks</code> directives.</p>
+<p>See notes to the right for specifics.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="the-api"><a class="header" href="#the-api">The API</a></h1>
+<p>Each of the API functions that map to an HTTP verb have at least one arity
+that supports setting lhc options which are passed to <code>lhc:request</code>.
+These options may have zero or more of the following:</p>
+<ul>
+<li><code>return</code> - return type. Can be one of <code>body</code> (default), <code>status</code>,
+<code>headers</code> or <code>all</code></li>
+<li><code>callback</code> - the function that gets called once a result is obtained
+from the <code>lhttpc</code> client library</li>
+</ul>
+<p>The lhc examples below are run against a YAWS REST server demo store. You can
+download and run the &quot;store&quot; yourself when you
+<a href="https://github.com/lfex/yaws-rest-starter">clone the repo</a>.</p>
+<p>For <code>POST</code>ing data, we use the <a href="https://github.com/lfex/ljson">ljson</a> LFE
+library. To make this available to your project, simply add it to your
+<code>rebar.config</code> file, per the instructions on the ljson project README.</p>
+<h2 id="start"><a class="header" href="#start"><code>start</code></a></h2>
+<blockquote>
+<p>It is required to start lhc before using the API:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:start)
+(#(inets ok) #(ssl ok) #(lhttpc ok) #(lhc ok))
+</code></pre>
+<blockquote>
+<p>If you attempt to use the API without having first started it,
+you will see errors like the following:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:get &quot;http://localhost:8000/demos/store3/orders&quot;)
+#(error
+  #(exit
+    #(noproc
+      #(gen_server call
+        (undefined #(socket &lt;0.35.0&gt; &quot;google.com&quot; 80 false) infinity)))
+    (#(lhttpc_manager ensure_call 6
+       (#(file &quot;src/lhttpc_manager.erl&quot;) #(line 234)))
+     #(lhttpc_client execute 9 (#(file &quot;src/lhttpc_client.erl&quot;) #(line 158)))
+     #(lhttpc_client request 9 (#(file &quot;src/lhttpc_client.erl&quot;) #(line 99)))
+     #(proc_lib init_p_do_apply 3 (#(file &quot;proc_lib.erl&quot;) #(line 239))))))
+</code></pre>
+<p>This function simply starts the lhc LFE HTTP client. This is required for any
+use of the lhc client library.</p>
+<aside class="danger">
+If you do not start lhc, calling the API functions will result in errors.
+<p>lhc depends upon other applications which need to be started (e.g., the
+Erlang networking services, SSL support, etc.)</p>
+</aside>
+<h2 id="get"><a class="header" href="#get"><code>get</code></a></h2>
+<blockquote>
+<p>Perform a simple <code>GET</code>:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:get &quot;http://localhost:8000/demos/store3/orders&quot;)
+&quot;{\&quot;result\&quot;: \&quot;You got a list of orders.\&quot;}&quot;
+&gt;
+</code></pre>
+<ul>
+<li><code>lhc:get/1</code> - takes a URL</li>
+<li><code>lhc:get/2</code> - takes a URL and lhc options</li>
+<li><code>lhc:get/3</code> - takes a URL, list of headers, and lhc options</li>
+</ul>
+<p>Depending upon the <code>return</code> option (default being <code>body</code>) and  <code>callback</code>
+option, each of these will return a parsed result iof the content obtained by
+<code>lhttpc</code>.</p>
+<h2 id="head"><a class="header" href="#head"><code>head</code></a></h2>
+<blockquote>
+<p>To just get the headers from the server:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:head &quot;http://localhost:8000/demos/store3/&quot;)
+(#(&quot;Content-Type&quot; &quot;application/json&quot;)
+ #(&quot;Date&quot; &quot;Thu, 27 Aug 2015 14:39:31 GMT&quot;)
+ #(&quot;Server&quot; &quot;Yaws 2.0&quot;))
+&gt;
+</code></pre>
+<ul>
+<li><code>lhc:head/1</code> - takes a URL</li>
+<li><code>lhc:head/2</code> - takes a URL and lhc options</li>
+<li><code>lhc:head/3</code> - takes a URL, list of headers, and lhc options</li>
+</ul>
+<p>Returns just the parsed headers of the result from <code>lhttpc</code>. By defualt, this
+is a list of tuples, each being a key/value pair of header name and head value.</p>
+<h2 id="post"><a class="header" href="#post"><code>post</code></a></h2>
+<blockquote>
+<p>To <code>POST</code>, we first create a payload. The demo REST API we're testing against
+can take any string value, but many applications will expect JSON data. Let's
+use JSON here:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (set payload (ljson:encode '(#(make #&quot;Volvo&quot;) #(model #&quot;P1800&quot;))))
+#&quot;{&quot;make&quot;:&quot;Volvo&quot;,&quot;model&quot;:&quot;P1800&quot;}&quot;
+&gt;
+</code></pre>
+<blockquote>
+<p>With our payload in hand, we can now <code>POST</code> to create a new order:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:post &quot;http://localhost:8000/demos/store3/order&quot; payload)
+&quot;{\&quot;result\&quot;: \&quot;{\&quot;order-id\&quot;: 124}\&quot;}&quot;
+&gt;
+</code></pre>
+<ul>
+<li><code>lhc:post/1</code> - takes a URL, making an empty data <code>POST</code></li>
+<li><code>lhc:post/2</code> - takes a URL and <code>POST</code> data</li>
+<li><code>lhc:post/3</code> - takes a URL, <code>POST</code> data, and lhc options</li>
+<li><code>lhc:post/4</code> - takes a URL, <code>POST</code> data, a list of headers, and lhc
+options</li>
+</ul>
+<h2 id="put"><a class="header" href="#put"><code>put</code></a></h2>
+<blockquote>
+<p>To <code>PUT</code>, we first create a payload similar to what we did for <code>POST</code> but
+with the modified data we want:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (set payload (ljson:encode '(#(make #&quot;Volvo&quot;) #(model #&quot;2015 P1800&quot;))))
+#&quot;{&quot;make&quot;:&quot;Volvo&quot;,&quot;model&quot;:&quot;2015 P1800&quot;}&quot;
+&gt;
+</code></pre>
+<blockquote>
+<p>We can now <code>PUT</code> to update our order:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:put &quot;http://localhost:8000/demos/store3/order/124&quot; payload)
+&quot;{\&quot;result\&quot;: \&quot;You updated all of order 124.\&quot;}&quot;
+&gt;
+</code></pre>
+<ul>
+<li><code>lhc:put/1</code> - takes a URL, making an empty data <code>PUT</code></li>
+<li><code>lhc:put/2</code> - takes a URL and <code>PUT</code> data</li>
+<li><code>lhc:put/3</code> - takes a URL, <code>PUT</code> data, and lhc options</li>
+<li><code>lhc:put/4</code> - takes a URL, <code>PUT</code> data, a list of headers, and lhc
+options</li>
+</ul>
+<h2 id="delete"><a class="header" href="#delete"><code>delete</code></a></h2>
+<blockquote>
+<p><code>DELETE</code>ing is as simple as passing the appropriate URL:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:delete &quot;http://localhost:8000/demos/store3/order/124&quot;)
+&quot;{\&quot;result\&quot;: \&quot;You deleted order 124.\&quot;}&quot;
+&gt;
+</code></pre>
+<ul>
+<li><code>lhc:delete/1</code> - takes a URL</li>
+<li><code>lhc:delete/2</code> - takes a URL and lhc options</li>
+<li><code>lhc:delete/3</code> - takes a URL, list of headers, and lhc options</li>
+</ul>
+<h2 id="trace"><a class="header" href="#trace"><code>trace</code></a></h2>
+<p>Note that <code>TRACE</code> isn't implemented in YAWS so we don't have example code to
+share. Likewise, <code>lhc:trace</code> is untested against a server implementing
+<code>TRACE</code> -- please
+<a href="https://github.com/lfex/lhc/issues/new">let us know</a>
+if you run into usage problems with this function.</p>
+<ul>
+<li><code>lhc:trace/1</code> - takes a URL</li>
+<li><code>lhc:trace/2</code> - takes a URL and data</li>
+<li><code>lhc:trace/3</code> - takes a URL, data, and lhc options</li>
+<li><code>lhc:trace/4</code> - takes a URL, data, a list of headers, and lhc options</li>
+</ul>
+<h2 id="options"><a class="header" href="#options"><code>options</code></a></h2>
+<blockquote>
+<p>lhc provides support for requesting the allowed methods for a given URL:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:options &quot;http://localhost:8000/demos/store3/order/124&quot;)
+&quot;{\&quot;result\&quot;: \&quot;You got the allowed method for order/124: GET, PUT, POST, DELETE, and OPTIONS.\&quot;}&quot;
+</code></pre>
+<ul>
+<li><code>lhc:options/1</code> - takes a URL</li>
+<li><code>lhc:options/2</code> - takes a URL and lhc options</li>
+<li><code>lhc:options/3</code> - takes a URL, list of headers, and lhc options</li>
+</ul>
+<h2 id="connect"><a class="header" href="#connect"><code>connect</code></a></h2>
+<p>TBD</p>
+<p>(Note that this HTTP verb is not supported by YAWS, so we'll likely save it for
+very last.)</p>
+<h2 id="patch"><a class="header" href="#patch"><code>patch</code></a></h2>
+<blockquote>
+<p>Let's define the partial data we want to send:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (set payload (ljson:encode '(#(model #&quot;2015 P1800&quot;))))
+#&quot;{&quot;model&quot;:&quot;2015 P1800&quot;}&quot;
+&gt;
+</code></pre>
+<blockquote>
+<p>We can now <code>PATCH</code> our order, updating only the part that we wanted to
+change:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:patch &quot;http://localhost:8000/demos/store3/order/124&quot; payload)
+&quot;{\&quot;result\&quot;: \&quot;You updated part of order 124.\&quot;}&quot;
+&gt;
+</code></pre>
+<p><code>PATCH</code> is useful for large data sets where you only one a part of the data
+updated. You can use <code>PATCH</code> to update just the bits you're interested in,
+without having to send the entire payload like is recommended with <code>PUT</code>.</p>
+<ul>
+<li><code>lhc:patch/1</code> - takes a URL, making an empty data <code>PATCH</code></li>
+<li><code>lhc:patch/2</code> - takes a URL and <code>PATCH</code> data</li>
+<li><code>lhc:patch/3</code> - takes a URL, <code>PATCH</code> data, and lhc options</li>
+<li><code>lhc:patch/4</code> - takes a URL, <code>PATCH</code> data, a list of headers, and lhc
+options</li>
+</ul>
+<h2 id="request"><a class="header" href="#request"><code>request</code></a></h2>
+<p>[Code ready, need docs]</p>
+<h2 id="parse-results"><a class="header" href="#parse-results"><code>parse-results</code></a></h2>
+<p>[Code ready, need docs]</p>
+<h1 id="custom-results-parsing"><a class="header" href="#custom-results-parsing">Custom Results Parsing</a></h1>
+<p>[Code ready, need docs]</p>
+<h1 id="from-erlang"><a class="header" href="#from-erlang">From Erlang</a></h1>
+<blockquote>
+<p>Basic usage from Erlang is straight-forward:</p>
+</blockquote>
+<pre><code class="language-erlang">1&gt; lhc:start().
+[{inets,ok},{ssl,ok},{lhttpc,ok},{lhc,ok}]
+2&gt; lhc:get(&quot;http://localhost:8000/demos/store3/orders&quot;).
+&quot;{\&quot;result\&quot;: \&quot;You got a list of orders.\&quot;}&quot;
+3&gt; Payload = ljson:encode([{make,&lt;&lt;&quot;Volvo&quot;&gt;&gt;},{model,&lt;&lt;&quot;P1800&quot;&gt;&gt;}]).
+&lt;&lt;&quot;{\&quot;make\&quot;:\&quot;Volvo\&quot;,\&quot;model\&quot;:\&quot;P1800\&quot;}&quot;&gt;&gt;
+4&gt; lhc:post(&quot;http://localhost:8000/demos/store3/order&quot;, Payload).
+&quot;{\&quot;result\&quot;: \&quot;{\&quot;order-id\&quot;: 124}\&quot;}&quot;
+</code></pre>
+<p>Using lhc from Erlang is very straight-forward; there aren't even hypens in
+most module or function names, so no need to escape any atoms!</p>
+<p>Why would you want to, you ask? Well, it might be convenient to use a library
+that offers consistent usage patterns (and function calls) across a selection
+of HTTP clients in the Erlang ecosystem. You and your developers could write
+your HTTP code once, and then change backend clients as the needs arose,
+without having to change any code (just some small configuration settings).</p>
+<p>Take a look at the sample usage to the right to get a sense of using lhc from
+Erlang.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="url-functions"><a class="header" href="#url-functions">URL Functions</a></h1>
+<p>The <code>lhc-url</code> module contains functions for working with HTTP URLs</p>
+<h2 id="related-records"><a class="header" href="#related-records">Related Records</a></h2>
+<p>The <code>lhc-url</code> module has access to two records and the autogenerated functions of each:</p>
+<ul>
+<li><code>urldata</code></li>
+<li><code>netloc</code></li>
+</ul>
+<p>While the module's functions provide most of what one needs with regard to these records, it may be useful for the developer to perform pattern matching against the record fields. As such, the fields are listed here:</p>
+<ul>
+<li><code>urldata</code>: scheme, netloc, path, params, query, fragment</li>
+<li><code>netloc</code>: username, password, host, port</li>
+</ul>
+<h2 id="new"><a class="header" href="#new"><code>new</code></a></h2>
+<p>TBD</p>
+<h2 id="accessors"><a class="header" href="#accessors">Accessors</a></h2>
+<p>TBD</p>
+<h2 id="parse"><a class="header" href="#parse"><code>parse</code></a></h2>
+<p>TBD</p>
+<h2 id="encode"><a class="header" href="#encode"><code>encode</code></a></h2>
+<p>TBD</p>
+<h2 id="decode"><a class="header" href="#decode"><code>decode</code></a></h2>
+<p>TBD</p>
+<h2 id="join"><a class="header" href="#join"><code>join</code></a></h2>
+<p>TBD</p>
+<h2 id="split"><a class="header" href="#split"><code>split</code></a></h2>
+<p>TBD</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="backends"><a class="header" href="#backends">Backends</a></h1>
+<p>lhc supports a handfule of backends, with more future ones planned.</p>
+<p>Current backends are:</p>
+<ul>
+<li><a href="http://erlang.org/doc/man/httpc.html">httpc</a></li>
+<li><a href="http://github.com/billosys/lhttpc">lhttpc</a></li>
+<li><a href="https://github.com/ferd/dlhttpc">dlhttpc</a></li>
+<li><a href="https://github.com/benoitc/hackney">hackney</a></li>
+<li><a href="https://github.com/cmullaparthi/ibrowse">ibrowse</a></li>
+</ul>
+<p>Planned backends currently include the following:</p>
+<ul>
+<li><a href="https://github.com/inaka/shotgun">shotgun</a></li>
+<li><a href="https://github.com/esl/fusco">fusco</a></li>
+</ul>
+<h2 id="selecting"><a class="header" href="#selecting">Selecting</a></h2>
+<blockquote>
+<p>Edit the backend value in the <code>lhc</code> section of your <code>lfe.config</code> file.
+See the lhc <code>lfe.config</code> for an example of this. Once edited, running
+<code>start</code> will use that value:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:start)
+(#(inets ok) #(ssl ok) #(lhttpc ok) #(lhc ok))
+&gt; (lhc:get-backend)
+lhttpc
+&gt;
+</code></pre>
+<blockquote>
+<p>You can also start lhc with your preferred backend:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:start 'httpc)
+(#(inets ok) #(ssl ok) #(lhc ok))
+&gt;
+</code></pre>
+<blockquote>
+<p>You can change backends at any time:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:change-backend 'lhttpc)
+(#(backend #(previous httpc) #(current lhttpc)))
+&gt;
+</code></pre>
+<p>Bakends my be selected one of three ways:</p>
+<ul>
+<li>setting the <code>backend</code> value in the <code>lhc</code> section of the <code>lfe.config</code>
+file</li>
+<li>Starting lhc with a particular bacend.</li>
+<li>Changing the backend after lhc has been started.</li>
+</ul>
+<aside class="danger">
+If you wish to use a backend, you <strong>must</strong> have the desired HTTP
+client library installed, as well as all of its dependencies. Attempting to
+start a backend that hasn't been installed (or whose libraries are not present
+in <code>ERL_LIBS</code>) will result in errors upon startup.
+</aside>
+<h2 id="backend-information"><a class="header" href="#backend-information">Backend Information</a></h2>
+<blockquote>
+<p>Find out which backend you are using:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:get-backend)
+lhttpc
+&gt;
+</code></pre>
+<blockquote>
+<p>Find out which backend is configured in your <code>lfe.config</code> file:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:get-backend-cfg)
+lhttpc
+</code></pre>
+<blockquote>
+<p>Find out which module holds the backend functions:</p>
+</blockquote>
+<pre><code class="language-lfe">&gt; (lhc:get-backend-module)
+lhc-backend
+</code></pre>
+<p>Several convenience functions are provided in support of lhc backends.</p>
+<p>See examples to the right.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="user-agent"><a class="header" href="#user-agent">User Agent</a></h1>
+<blockquote>
+<p>The lhc user agent string:</p>
+</blockquote>
+<pre><code>&quot;LFE Little HTTP Client/0.1.0 (LFE 0.10.0-dev; Erlang 18; backend=lhttpc) (+http://github.com/lfex/lhc)&quot;
+</code></pre>
+<p>The lhc user agent will show up in any HTTP server log files where client user
+agent strings are recorded. To the right is an example of the lhc user agent
+string.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="previous-versions"><a class="header" href="#previous-versions">Previous Versions</a></h1>
+<p>Documentation is available for all previous releases:</p>
+<ul>
+<li><a href="v0.1.0/">v0.1.0</a></li>
+<li><a href="v0.2.0/">v0.2.0</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="license"><a class="header" href="#license">License</a></h1>
+<p>Copyright © 2014-2015 Duncan McGreggor <a href="mailto:oubiwann@gmail.com">oubiwann@gmail.com</a></p>
+<p>Licensed under the Apache License, Version 2.0 (the &quot;License&quot;);
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at</p>
+<ul>
+<li>http://www.apache.org/licenses/LICENSE-2.0</li>
+</ul>
+<p>Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an &quot;AS IS&quot; BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.</p>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>

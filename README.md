@@ -4,7 +4,6 @@
 [![LFE Versions][lfe badge]][lfe]
 [![Erlang Versions][erlang badge]][version]
 [![Tags][github tags badge]][github tags]
-[![Downloads][hex downloads]][hex package]
 
 *Little (LFE) HTTP Client -- A light-weight LFE wrapper around lhttpc*
 
