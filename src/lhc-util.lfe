@@ -5,12 +5,10 @@
   ;; The following code renders a user agent string along these lines:
   ;;    "LFE Little HTTP Client/0.1.0 (LFE 0.10.0-dev; Erlang 18; backend=lhttpc) (+http://github.com/lfex/lhc)"
   (++ "LFE Little HTTP Client/"
-      (get-version)
-      " (LFE " (lutil:get-lfe-version)
+      (lhc:version)
+      " (LFE " (lhc-vsn:get 'lfe)
       "; Erlang " (erlang:system_info 'otp_release)
-      "; backend=" (lhc:get-backend '(#(return list))) ") "
-      "(+http://github.com/"
-      (proplists:get_value 'github (lcfg-proj:get-repos))
+      "(+http://github.com/lfe-http/lhc"
       ")"))
 
 (defun utf8-encode
