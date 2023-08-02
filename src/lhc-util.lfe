@@ -8,8 +8,7 @@
       (lhc:version)
       " (LFE " (lhc-vsn:get 'lfe)
       "; Erlang " (erlang:system_info 'otp_release)
-      "(+http://github.com/lfe-http/lhc"
-      ")"))
+      "(+http://github.com/lfe-http/lhc)"))
 
 (defun utf8-encode
   ((characters) (when (is_binary characters))
