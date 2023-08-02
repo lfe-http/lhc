@@ -53,7 +53,7 @@ Since version 0.2.0, the lhc library has moved to using ``rebar3`` and no longer
 
 ```erlang
 {plugins, [
-   {'lfe-compile', ".*", {git, "https://github.com/lfe-rebar3/compile.git", {tag, "0.2.0"}}}
+   {rebar3_lfe, "0.4.4"}}}
   ]}.
 {provider_hooks, [
    {pre, [{compile, {lfe, compile}}]}
@@ -64,10 +64,9 @@ Since version 0.2.0, the lhc library has moved to using ``rebar3`` and no longer
 
 ```erlang
 {deps, [
-...
-{lhc, ".*",
-  {git, "git@github.com:lfex/lhc.git", "0.2.0"}}
-  ]}.
+  ...
+  {lhc, "0.4.0"}, 
+]}.
 ```
 
 > Once your project has added the lhc dependency, you're ready to  execute the ``rebar3`` command for compiling LFE projects:
@@ -81,7 +80,3 @@ $ rebar3 lfe compile
 ```bash
 $ rebar3 compile
 ```
-
-Since lhc now uses ``rebar3``, you'll need to configure your project's ``rebar.config`` file to pull down the necessary ``rebar3`` plugins. A good example of this is the [rebar.config file](https://github.com/lfex/lcfg/blob/master/rebar.config) for the lcfg project. In particular, you'll want to have the same ``plugins`` and ``provider_hooks`` directives.
-
-See notes to the right for specifics.

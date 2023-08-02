@@ -1,8 +1,12 @@
 # Backends
 
-lhc supports a handfule of backends, with more future ones planned.
+WARNING!!!
 
-Current backends are:
+lhc used to and will again support the concept of pluings, allowing users to wrap their preferred HTTP client library.
+
+Currently backend support has been suspended and the httpc client that comes bundled with Erlang is hard-coded.
+
+Old backends:
 
 * [httpc](http://erlang.org/doc/man/httpc.html)
 * [lhttpc](http://github.com/billosys/lhttpc)

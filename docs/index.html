@@ -187,7 +187,7 @@ Note that the following have not yet been implemented:
 <p>To use the <code>rebar3</code> LFE plugin, update your <code>rebar.config</code> file like the following:</p>
 </blockquote>
 <pre><code class="language-erlang">{plugins, [
-   {'lfe-compile', &quot;.*&quot;, {git, &quot;https://github.com/lfe-rebar3/compile.git&quot;, {tag, &quot;0.2.0&quot;}}}
+   {rebar3_lfe, &quot;0.4.4&quot;}}}
   ]}.
 {provider_hooks, [
    {pre, [{compile, {lfe, compile}}]}
@@ -197,10 +197,9 @@ Note that the following have not yet been implemented:
 <p>Then update the <code>deps</code> directive in your <code>rebar.config</code> to pull down the latest lhc:</p>
 </blockquote>
 <pre><code class="language-erlang">{deps, [
-...
-{lhc, &quot;.*&quot;,
-  {git, &quot;git@github.com:lfex/lhc.git&quot;, &quot;0.2.0&quot;}}
-  ]}.
+  ...
+  {lhc, &quot;0.4.0&quot;}, 
+]}.
 </code></pre>
 <blockquote>
 <p>Once your project has added the lhc dependency, you're ready to  execute the <code>rebar3</code> command for compiling LFE projects:</p>
@@ -212,8 +211,6 @@ Note that the following have not yet been implemented:
 </blockquote>
 <pre><code class="language-bash">$ rebar3 compile
 </code></pre>
-<p>Since lhc now uses <code>rebar3</code>, you'll need to configure your project's <code>rebar.config</code> file to pull down the necessary <code>rebar3</code> plugins. A good example of this is the <a href="https://github.com/lfex/lcfg/blob/master/rebar.config">rebar.config file</a> for the lcfg project. In particular, you'll want to have the same <code>plugins</code> and <code>provider_hooks</code> directives.</p>
-<p>See notes to the right for specifics.</p>
 
                     </main>
 
