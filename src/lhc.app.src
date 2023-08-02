@@ -36,14 +36,14 @@
   %% Package metadata:
   {licenses, ["Apache-2"]},
   {links,
-   [{"GitHub", "https://github.com/lfex/lhc"},
+   [{"GitHub", "https://github.com/lfe-http/lhc"},
     {"Gitlab", "https://gitlab.com/lfex/lhc"},
     {"Hex", "https://hex.pm/packages/lhc"}
    ]},
   {exclude_files, [
     "priv/html/*",
     "priv/images/*",
-    "priv/make/*"
+    "priv/mdbook/*"
   ]}
  ]}.
 
