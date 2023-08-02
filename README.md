@@ -41,10 +41,9 @@ Just add it to your `rebar.config` deps:
 
 ```erlang
 {deps, [
-...
-{lhc, ".*",
-  {git, "git@github.com:lfex/lhc.git", "master"}}
-  ]}.
+  ...
+  {lhc, "0.4.0"}
+]}.
 ```
 
 And then do the usual:
@@ -56,15 +55,7 @@ $ rebar compile
 
 ## Usage [&#x219F;](#contents)
 
-Usage information is provided in the [documentation](http://lfex.github.io/lhc/).
-
-
-## Backends [&#x219F;](#contents)
-
-lhc is not an HTTP client in its own right, rather a wrapper for HTTP clients.
-These "backends" are selectable using a directive in the `lfe.config` file.
-For more information, see the
-[backend documentation](http://lfex.github.io/lhc/current/#backends).
+Usage information is provided in the [documentation](http://lfe-http.github.io/lhc/).
 
 
 ## License [&#x219F;](#contents)
@@ -73,7 +64,7 @@ Apache Version 2 License
 
 Copyright (c) 2015 BilloSystems, Ltd. Co.
 
-Copyright (c) 2015-2016 Duncan McGreggor <oubiwann@gmail.com>
+Copyright (c) 2015-2023 Duncan McGreggor <oubiwann@gmail.com>
 
 
 <!-- Named page links below: /-->
