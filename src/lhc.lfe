@@ -8,7 +8,7 @@
 
 (defun start (backend)
   (change-backend backend)
-  (code:ensure_all_started 'lhc))
+  (application:ensure_all_started 'lhc))
 
 ;;; GET
 
@@ -236,7 +236,9 @@
    (atom_to_list (get-backend))))
 
 (defun get-backend-cfg ()
-  (lcfg:get-in '(lhc backend)))
+  ;;(lcfg:get-in '(lhc backend)))
+  ;; XXX for now, there is only one:
+  'httpc)
 
 (defun change-backend (backend)
   `(#(backend
@@ -254,4 +256,4 @@
   (lhc-vsn:get))
 
 (defun versions ()
-  (lhc-vns:all))
+  (lhc-vsn:all))

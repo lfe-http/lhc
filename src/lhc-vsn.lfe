@@ -1,6 +1,6 @@
 (defmodule lhc-vsn
   (export
-   (get 0)
+   (get 0) (get 1)
    (all 0)))
 
 (defun get ()
@@ -29,7 +29,7 @@
     #(driver ,(erlang:system_info 'driver_version))))
 
 (defun all ()
-  (lists:append `((,(version+name 'yuri))
+  (lists:append `((,(version+name 'lhc))
                   ,(versions-langs)
                   ,(versions-rebar)
                   (,(version-arch)))))
