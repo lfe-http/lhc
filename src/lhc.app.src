@@ -4,11 +4,20 @@
   {description, "LFE Little HTTP Client"},
 
   %% The version of the application
-  {vsn, "0.4.0"},
+  {vsn, "2.0.0"},
 
   %% All modules used by the application.
   {modules, [
-    lhc
+    lhc,
+    'lhc-async',
+    'lhc-cookies',
+    'lhc-error',
+    'lhc-gun',
+    'lhc-httpc',
+    'lhc-sync',
+    'lhc-util',
+    'lhc-vsn',
+    'lhc-websocket'
   ]},
 
   %% All of the registered names the application uses. This can be ignored.
@@ -21,7 +30,8 @@
     kernel,
     stdlib,
     inets,
-    ssl
+    ssl,
+    gun
   ]},
 
   %% OTP application loader will load, but not start, included apps. Again
@@ -31,7 +41,9 @@
 
   %% configuration parameters similar to those in the config file specified
   %% on the command line. can be fetched with gas:get_env
-  {env, []},
+  {env, [
+    {default_backend, httpc}
+  ]},
 
   %% Package metadata:
   {licenses, ["Apache-2"]},
