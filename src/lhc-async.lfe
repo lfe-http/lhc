@@ -303,8 +303,9 @@
          (await-httpc request-id timeout))
         ('gun
          (let ((result (await-gun conn stream-ref timeout)))
-           (when (and auto-close (is_pid conn))
-             (lhc-gun:close-connection conn))
+           (if (and auto-close (is_pid conn))
+             (lhc-gun:close-connection conn)
+             'ok)
            (clear-request-info request-id)
            result))
         (_

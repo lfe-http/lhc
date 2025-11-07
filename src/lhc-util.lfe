@@ -160,10 +160,9 @@
 
   Returns:
     Integer timestamp in milliseconds since Unix epoch"
-  (()
-   (let ((`#(,mega ,sec ,micro) (erlang:timestamp)))
-     (+ (* (+ (* mega 1000000) sec) 1000)
-        (div micro 1000)))))
+  (let ((`#(,mega ,sec ,micro) (erlang:timestamp)))
+    (+ (* (+ (* mega 1000000) sec) 1000)
+       (div micro 1000))))
 
 (defun parse-content-type
   "Parse a Content-Type header value into components.
@@ -219,9 +218,10 @@
     List of {binary(), binary()} tuples with lowercase names"
   ((headers) (when (is_map headers))
    (lists:map
-    (lambda (`#(,name ,value))
-      `#(,(lowercase (ensure-binary name))
-         ,(ensure-binary value)))
+    (lambda (header)
+      (let ((`#(,name ,value) header))
+        `#(,(lowercase (ensure-binary name))
+           ,(ensure-binary value))))
     (maps:to_list headers)))
 
   ((headers) (when (is_list headers))
@@ -252,9 +252,9 @@
 
   ((uri) (when (is_list uri))
    (case (uri_string:parse uri)
-     (uri-map) (when (is_map uri-map))
+     (uri-map (when (is_map uri-map))
       (let ((normalized (normalize-uri-map uri-map)))
-        `#(ok ,normalized))
+        `#(ok ,normalized)))
      (`#(error ,reason ,_term)
       (lhc-error:normalize 'lhc `#(invalid-uri ,reason)))
      (_
@@ -285,10 +285,10 @@
   ((uri-map) (when (is_map uri-map))
    (let ((erlang-uri-map (uri-map-to-erlang uri-map)))
      (case (uri_string:recompose erlang-uri-map)
-       (uri) (when (is_list uri))
-        `#(ok ,(list_to_binary uri))
-       (uri) (when (is_binary uri))
-        `#(ok ,uri)
+       (uri (when (is_list uri))
+        `#(ok ,(list_to_binary uri)))
+       (uri (when (is_binary uri))
+        `#(ok ,uri))
        (`#(error ,reason ,_term)
         (lhc-error:normalize 'lhc `#(invalid-uri ,reason)))
        (_
@@ -302,9 +302,9 @@
   ((uri-map)
    (let ((m (map)))
      (lists:foldl
-      (lambda (`#(,key ,value) acc)
-        (case `#(,key ,value)
-          (`#(,k ,v) (when (=/= v 'undefined) (=/= v (binary)))
+      (lambda (kv acc)
+        (case kv
+          (`#(,k ,v) (when (=/= v 'undefined) (=/= v #""))
            (maps:put k (binary_to_list (ensure-binary v)) acc))
           (`#(port ,p) (when (is_integer p))
            (maps:put 'port p acc))
@@ -326,9 +326,9 @@
   ((uri) (when (is_list uri))
    (case (parse-uri uri)
      (`#(ok ,uri-map)
-      (let ((path (maps:get 'path uri-map <<"/">>))
-            (query (maps:get 'query uri-map <<"">>)))
-        (if (=:= query (binary))
+      (let ((path (maps:get 'path uri-map #"/"))
+            (query (maps:get 'query uri-map #"")))
+        (if (=:= query #"")
           path
           (list_to_binary (++ (binary_to_list path)
                               "?"

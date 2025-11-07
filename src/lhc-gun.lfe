@@ -43,7 +43,7 @@
    ;; Normalization
    (normalize-response 1)
    (normalize-headers 1)
-   (make-gun-options 1)
+   (make-gun-options 2)
 
    ;; Utilities
    (get-port 1)
@@ -394,8 +394,8 @@
     'tcp or 'tls"
   ((uri-map)
    (case (maps:get 'scheme uri-map)
-     (<<"https">>) 'tls)
-     (<<"wss">>) 'tls)
+     (#"https" 'tls)
+     (#"wss" 'tls)
      (_ 'tcp))))
 
 (defun get-default-protocols
@@ -445,8 +445,8 @@
    (case (maps:get 'port uri-map 'undefined)
      ('undefined
       (case (maps:get 'scheme uri-map)
-        (<<"https">>) 443)
-        (<<"wss">>) 443)
+        (#"https" 443)
+        (#"wss" 443)
         (_ 80)))
      (port port))))
 
@@ -521,15 +521,15 @@
 
   Returns:
     Binary method name (e.g., <<\"GET\">>)"
-  (('GET) <<"GET">>)
-  (('HEAD) <<"HEAD">>)
-  (('POST) <<"POST">>)
-  (('PUT) <<"PUT">>)
-  (('PATCH) <<"PATCH">>)
-  (('DELETE) <<"DELETE">>)
-  (('OPTIONS) <<"OPTIONS">>)
-  (('CONNECT) <<"CONNECT">>)
-  (('TRACE) <<"TRACE">>)
+  (('GET) #"GET")
+  (('HEAD) #"HEAD")
+  (('POST) #"POST")
+  (('PUT) #"PUT")
+  (('PATCH) #"PATCH")
+  (('DELETE) #"DELETE")
+  (('OPTIONS) #"OPTIONS")
+  (('CONNECT) #"CONNECT")
+  (('TRACE) #"TRACE")
   ((method) (when (is_atom method))
    (atom_to_binary method 'utf8))
   ((method) (when (is_binary method))

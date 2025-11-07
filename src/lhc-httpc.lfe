@@ -171,7 +171,7 @@
    (try
      (iolist_to_binary body)
      (catch
-       (_ _ body)))))
+       ((tuple _ _ _) body)))))
 
 ;;; ===================================================================
 ;;; HTTP Options Conversion

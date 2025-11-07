@@ -281,7 +281,7 @@
     A formatted binary string"
   ((error-map) (when (is_map error-map))
    (let ((reason (maps:get 'reason error-map 'unknown))
-         (message (maps:get 'message error-map <<"Unknown error">>))
+         (message (maps:get 'message error-map #"Unknown error"))
          (backend (maps:get 'backend error-map 'unknown)))
      (list_to_binary
       (++ "[" (string:uppercase (atom_to_list backend)) "] "
@@ -325,7 +325,7 @@
         (`#(ssl ,reason)
          (ensure-binary reason))
         (_
-         <<"SSL connection failed">>)))))
+         #"SSL connection failed")))))
 
   ((details)
    (list_to_binary

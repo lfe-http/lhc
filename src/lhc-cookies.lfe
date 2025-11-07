@@ -30,7 +30,7 @@
    (gc 2)
 
    ;; Integration with requests
-   (add-cookie-header 2)
+   (add-cookie-header 3)
    (extract-set-cookies 1)
    (update-store-from-response 3)))
 
@@ -210,7 +210,7 @@
       (if (> (length cookies) 0)
         ;; Build Cookie header value
         (let* ((cookie-header (build-cookie-header cookies))
-               (new-headers (cons `#(<<"cookie">> ,cookie-header) headers)))
+               (new-headers (cons `#(#"cookie" ,cookie-header) headers)))
           `#(ok ,new-headers ,new-store))
         ;; No cookies
         `#(ok ,headers ,new-store)))
@@ -232,10 +232,10 @@
                (`#(,name ,value)
                 (binary name #"=" value))
                ;; gun_cookies may return maps or different formats
-               (cookie-map) (when (is_map cookie-map))
+               (cookie-map (when (is_map cookie-map))
                 (let ((name (maps:get 'name cookie-map))
                       (value (maps:get 'value cookie-map)))
-                  (binary name #"=" value))))
+                  (binary name #"=" value)))))
            cookies)))
      (list_to_binary (string:join (lists:map #'binary_to_list/1 cookie-strings) "; ")))))
 
@@ -255,7 +255,7 @@
       (case header
         (`#(,name ,value)
          (if (=:= (lhc-util:lowercase (lhc-util:ensure-binary name))
-                  <<"set-cookie">>)
+                  #"set-cookie")
            `#(true ,value)
            'false))
         (_ 'false)))
@@ -303,9 +303,9 @@
 
 (defun scheme-to-atom
   "Convert scheme binary to atom for gun_cookies."
-  ((<<"http">>) 'http)
-  ((<<"https">>) 'https)
   ((scheme) (when (is_atom scheme)) scheme)
+  ((scheme) (when (=:= scheme #"http")) 'http)
+  ((scheme) (when (=:= scheme #"https")) 'https)
   ((scheme) (when (is_binary scheme))
    (binary_to_atom scheme 'utf8)))
 
@@ -315,7 +315,7 @@
    (case (maps:get 'port uri-map 'undefined)
      ('undefined
       (case (maps:get 'scheme uri-map)
-        (<<"https">>) 443)
-        (<<"http">>) 80)
+        (#"https" 443)
+        (#"http" 80)
         (_ 80)))
      (port port))))
