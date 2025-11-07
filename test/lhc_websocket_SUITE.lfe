@@ -1,8 +1,5 @@
 ;; Integration tests for LHC WebSocket functionality
 ;; Uses echo.websocket.org for WebSocket echo testing
-
-(include-file "test_server.lfe")
-
 (defmodule lhc_websocket_SUITE
   (export (all 0) (suite 0)
           (init_per_suite 1) (end_per_suite 1)
@@ -14,6 +11,8 @@
           (test_multiple_text_frames 1)
           (test_ping_pong 1)
           (test_close_handling 1)))
+
+(include-file "test_server.lfe")
 
 ;;; Suite Configuration
 
@@ -55,11 +54,9 @@
   ([config] (when (is_list config))
    (let* ((ws-url (config 'ws_url config))
           ;; Open connection to WebSocket server
-          (`#(ok ,conn) (lhc:open ws-url (map 'backend 'gun))))
-
-     ;; Upgrade to WebSocket (sync mode)
-     (line (test-pat `#(ok ,ws-pid)
-                     (lhc-websocket:upgrade conn "/" (map) (map 'mode 'sync))))
+          (`#(ok ,conn) (lhc:open ws-url (map 'backend 'gun)))
+          ;; Upgrade to WebSocket (sync mode)
+          (`#(ok ,ws-pid) (lhc-websocket:upgrade conn "/" (map) (map 'mode 'sync))))
 
      ;; Verify we got a WebSocket reference
      (line (test-pat 'true (is_reference ws-pid)))
@@ -73,11 +70,9 @@
   (['doc] "Test asynchronous WebSocket upgrade")
   ([config] (when (is_list config))
    (let* ((ws-url (config 'ws_url config))
-          (`#(ok ,conn) (lhc:open ws-url (map 'backend 'gun))))
-
-     ;; Upgrade to WebSocket (async mode)
-     (line (test-pat `#(ok ,stream-ref)
-                     (lhc-websocket:upgrade conn "/" (map) (map 'mode 'async))))
+          (`#(ok ,conn) (lhc:open ws-url (map 'backend 'gun)))
+          ;; Upgrade to WebSocket (async mode)
+          (`#(ok ,stream-ref) (lhc-websocket:upgrade conn "/" (map) (map 'mode 'async))))
 
      ;; Verify we got a stream reference
      (line (test-pat 'true (is_reference stream-ref)))
@@ -112,12 +107,11 @@
                        (lhc-websocket:send-text conn ws text-data (map))))
 
        ;; Await echo response
-       (line (test-pat `#(ok ,frame)
-                       (lhc-websocket:await-frame conn ws 5000)))
+       (let ((`#(ok ,frame) (lhc-websocket:await-frame conn ws 5000)))
 
-       ;; Verify we got text frame back
-       (line (test-pat 'text (maps:get 'type frame)))
-       (line (test-pat text-data (maps:get 'data frame))))
+         ;; Verify we got text frame back
+         (line (test-pat 'text (maps:get 'type frame)))
+         (line (test-pat text-data (maps:get 'data frame)))))
 
      ;; Close connection
      (lhc:close conn)
@@ -139,12 +133,11 @@
                        (lhc-websocket:send-binary conn ws binary-data (map))))
 
        ;; Await echo response
-       (line (test-pat `#(ok ,frame)
-                       (lhc-websocket:await-frame conn ws 5000)))
+       (let ((`#(ok ,frame) (lhc-websocket:await-frame conn ws 5000)))
 
-       ;; Verify we got binary frame back
-       (line (test-pat 'binary (maps:get 'type frame)))
-       (line (test-pat binary-data (maps:get 'data frame))))
+         ;; Verify we got binary frame back
+         (line (test-pat 'binary (maps:get 'type frame)))
+         (line (test-pat binary-data (maps:get 'data frame)))))
 
      ;; Close connection
      (lhc:close conn)
@@ -169,21 +162,18 @@
                      (lhc-websocket:send-text conn ws #"Frame 3" (map))))
 
      ;; Receive all frames
-     (line (test-pat `#(ok ,frame1)
-                     (lhc-websocket:await-frame conn ws 5000)))
-     (line (test-pat #"Frame 1" (maps:get 'data frame1)))
+     (let ((`#(ok ,frame1) (lhc-websocket:await-frame conn ws 5000)))
+       (line (test-pat #"Frame 1" (maps:get 'data frame1)))
 
-     (line (test-pat `#(ok ,frame2)
-                     (lhc-websocket:await-frame conn ws 5000)))
-     (line (test-pat #"Frame 2" (maps:get 'data frame2)))
+       (let ((`#(ok ,frame2) (lhc-websocket:await-frame conn ws 5000)))
+         (line (test-pat #"Frame 2" (maps:get 'data frame2)))
 
-     (line (test-pat `#(ok ,frame3)
-                     (lhc-websocket:await-frame conn ws 5000)))
-     (line (test-pat #"Frame 3" (maps:get 'data frame3)))
+         (let ((`#(ok ,frame3) (lhc-websocket:await-frame conn ws 5000)))
+           (line (test-pat #"Frame 3" (maps:get 'data frame3)))
 
-     ;; Close connection
-     (lhc:close conn)
-     'ok)))
+           ;; Close connection
+           (lhc:close conn)
+           'ok))))))
 
 ;;; Ping/Pong Tests
 
@@ -201,15 +191,14 @@
 
      ;; Await pong response
      ;; Note: The server should respond with pong automatically
-     (line (test-pat `#(ok ,frame)
-                     (lhc-websocket:await-frame conn ws 5000)))
+     (let ((`#(ok ,frame) (lhc-websocket:await-frame conn ws 5000)))
 
-     ;; Verify we got pong frame
-     ;; Note: Some echo servers may echo ping as text, so we check for either
-     (let ((frame-type (maps:get 'type frame)))
-       (line (test-pat 'true
-                       (orelse (=:= frame-type 'pong)
-                               (=:= frame-type 'text)))))
+       ;; Verify we got pong frame
+       ;; Note: Some echo servers may echo ping as text, so we check for either
+       (let ((frame-type (maps:get 'type frame)))
+         (line (test-pat 'true
+                         (orelse (=:= frame-type 'pong)
+                                 (=:= frame-type 'text))))))
 
      ;; Close connection
      (lhc:close conn)
@@ -231,12 +220,11 @@
 
      ;; Await close response
      ;; Note: Server should respond with close frame
-     (line (test-pat `#(ok ,frame)
-                     (lhc-websocket:await-frame conn ws 5000)))
+     (let ((`#(ok ,frame) (lhc-websocket:await-frame conn ws 5000)))
 
-     ;; Verify we got close frame
-     (line (test-pat 'close (maps:get 'type frame)))
+       ;; Verify we got close frame
+       (line (test-pat 'close (maps:get 'type frame)))
 
-     ;; Close connection
-     (lhc:close conn)
-     'ok)))
+       ;; Close connection
+       (lhc:close conn)
+       'ok))))

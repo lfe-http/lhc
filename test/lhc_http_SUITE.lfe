@@ -87,10 +87,9 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           (url (binary base-url #"/get?foo=bar"))
-          (opts (map 'backend 'httpc)))
-     ;; Test successful GET
-     (line (test-pat `#(ok ,response)
-                     (lhc:get url opts)))
+          (opts (map 'backend 'httpc))
+          ;; Test successful GET
+          (`#(ok ,response) (lhc:get url opts)))
      ;; Verify response structure
      (line (test-pat 200 (maps:get 'status response)))
      (line (test-pat 'true (is_list (maps:get 'headers response))))
@@ -103,10 +102,9 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           (url (binary base-url #"/get?test=value"))
-          (opts (map 'backend 'gun)))
-     ;; Test successful GET
-     (line (test-pat `#(ok ,response)
-                     (lhc:get url opts)))
+          (opts (map 'backend 'gun))
+          ;; Test successful GET
+          (`#(ok ,response) (lhc:get url opts)))
      ;; Verify response
      (line (test-pat 200 (maps:get 'status response)))
      (line (test-pat 'true (is_binary (maps:get 'body response))))
@@ -122,10 +120,9 @@
           (url (binary base-url #"/post"))
           (body #"{\"test\": \"data\"}")
           (opts (map 'backend 'httpc
-                     'headers '(#(<<"content-type">> <<"application/json">>)))))
-     ;; Test POST
-     (line (test-pat `#(ok ,response)
-                     (lhc:post url body opts)))
+                     'headers '(#(<<"content-type">> <<"application/json">>))))
+          ;; Test POST
+          (`#(ok ,response) (lhc:post url body opts)))
      (line (test-pat 200 (maps:get 'status response)))
      'ok)))
 
@@ -137,10 +134,9 @@
           (url (binary base-url #"/post"))
           (body #"{\"foo\": \"bar\"}")
           (opts (map 'backend 'gun
-                     'headers '(#(<<"content-type">> <<"application/json">>)))))
-     ;; Test POST
-     (line (test-pat `#(ok ,response)
-                     (lhc:post url body opts)))
+                     'headers '(#(<<"content-type">> <<"application/json">>))))
+          ;; Test POST
+          (`#(ok ,response) (lhc:post url body opts)))
      (line (test-pat 200 (maps:get 'status response)))
      'ok)))
 
@@ -154,9 +150,8 @@
           (url (binary base-url #"/put"))
           (body #"{\"update\": \"data\"}")
           (opts (map 'backend 'httpc
-                     'headers '(#(<<"content-type">> <<"application/json">>)))))
-     (line (test-pat `#(ok ,response)
-                     (lhc:put url body opts)))
+                     'headers '(#(<<"content-type">> <<"application/json">>))))
+          (`#(ok ,response) (lhc:put url body opts)))
      (line (test-pat 200 (maps:get 'status response)))
      'ok)))
 
@@ -168,9 +163,8 @@
           (url (binary base-url #"/put"))
           (body #"{\"update\": \"value\"}")
           (opts (map 'backend 'gun
-                     'headers '(#(<<"content-type">> <<"application/json">>)))))
-     (line (test-pat `#(ok ,response)
-                     (lhc:put url body opts)))
+                     'headers '(#(<<"content-type">> <<"application/json">>))))
+          (`#(ok ,response) (lhc:put url body opts)))
      (line (test-pat 200 (maps:get 'status response)))
      'ok)))
 
@@ -182,9 +176,8 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           (url (binary base-url #"/delete"))
-          (opts (map 'backend 'httpc)))
-     (line (test-pat `#(ok ,response)
-                     (lhc:delete url opts)))
+          (opts (map 'backend 'httpc))
+          (`#(ok ,response) (lhc:delete url opts)))
      (line (test-pat 200 (maps:get 'status response)))
      'ok)))
 
@@ -194,9 +187,8 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           (url (binary base-url #"/delete"))
-          (opts (map 'backend 'gun)))
-     (line (test-pat `#(ok ,response)
-                     (lhc:delete url opts)))
+          (opts (map 'backend 'gun))
+          (`#(ok ,response) (lhc:delete url opts)))
      (line (test-pat 200 (maps:get 'status response)))
      'ok)))
 
@@ -210,17 +202,15 @@
           (url (binary base-url #"/headers"))
           (custom-headers '(#(<<"X-Test-Header">> <<"test-value">>)
                            #(<<"X-Custom">> <<"custom-value">>)))
-          (opts (map 'headers custom-headers)))
-     ;; Test with httpc
-     (line (test-pat `#(ok ,response1)
-                     (lhc:get url (maps:put 'backend 'httpc opts))))
+          (opts (map 'headers custom-headers))
+          ;; Test with httpc
+          (`#(ok ,response1) (lhc:get url (maps:put 'backend 'httpc opts))))
      (line (test-pat 200 (maps:get 'status response1)))
 
      ;; Test with gun
-     (line (test-pat `#(ok ,response2)
-                     (lhc:get url (maps:put 'backend 'gun opts))))
-     (line (test-pat 200 (maps:get 'status response2)))
-     'ok)))
+     (let ((`#(ok ,response2) (lhc:get url (maps:put 'backend 'gun opts))))
+       (line (test-pat 200 (maps:get 'status response2)))
+       'ok))))
 
 ;;; Status Code Tests
 
@@ -228,22 +218,19 @@
   (['suite] ())
   (['doc] "Test various HTTP status codes")
   ([config] (when (is_list config))
-   (let ((base-url (config 'base_url config)))
-     ;; Test 404
-     (line (test-pat `#(ok ,resp404)
-                     (lhc:get (binary base-url #"/status/404") (map))))
+   (let* ((base-url (config 'base_url config))
+          ;; Test 404
+          (`#(ok ,resp404) (lhc:get (binary base-url #"/status/404") (map))))
      (line (test-pat 404 (maps:get 'status resp404)))
 
      ;; Test 500
-     (line (test-pat `#(ok ,resp500)
-                     (lhc:get (binary base-url #"/status/500") (map))))
-     (line (test-pat 500 (maps:get 'status resp500)))
+     (let ((`#(ok ,resp500) (lhc:get (binary base-url #"/status/500") (map))))
+       (line (test-pat 500 (maps:get 'status resp500)))
 
-     ;; Test 201
-     (line (test-pat `#(ok ,resp201)
-                     (lhc:get (binary base-url #"/status/201") (map))))
-     (line (test-pat 201 (maps:get 'status resp201)))
-     'ok)))
+       ;; Test 201
+       (let ((`#(ok ,resp201) (lhc:get (binary base-url #"/status/201") (map))))
+         (line (test-pat 201 (maps:get 'status resp201)))
+         'ok)))))
 
 ;;; Error Handling Tests
 
@@ -252,16 +239,14 @@
   (['doc] "Test error handling for invalid URLs and connection failures")
   ([config] (when (is_list config))
    ;; Test invalid domain
-   (line (test-pat `#(error ,error1)
-                   (lhc:get #"http://this-domain-does-not-exist-12345.com" (map))))
+   (let ((`#(error ,error1) (lhc:get #"http://this-domain-does-not-exist-12345.com" (map))))
      (line (test-pat 'true (is_map error1)))
-   (line (test-pat 'connection (maps:get 'reason error1)))
+     (line (test-pat 'connection (maps:get 'reason error1)))
 
-   ;; Test connection refused
-   (line (test-pat `#(error ,error2)
-                   (lhc:get #"http://localhost:9" (map 'timeout 1000))))
-   (line (test-pat 'true (is_map error2)))
-   'ok))
+     ;; Test connection refused
+     (let ((`#(error ,error2) (lhc:get #"http://localhost:9" (map 'timeout 1000))))
+       (line (test-pat 'true (is_map error2)))
+       'ok))))
 
 ;;; Timeout Tests
 
@@ -269,11 +254,10 @@
   (['suite] ())
   (['doc] "Test timeout handling")
   ([config] (when (is_list config))
-   (let ((base-url (config 'base_url config)))
-     ;; Test timeout on slow endpoint
-     ;; httpbin /delay/{n} delays response for n seconds
-     (line (test-pat `#(error ,error)
-                     (lhc:get (binary base-url #"/delay/10")
-                              (map 'timeout 1000))))  ; 1 second timeout
+   (let* ((base-url (config 'base_url config))
+          ;; Test timeout on slow endpoint
+          ;; httpbin /delay/{n} delays response for n seconds
+          (`#(error ,error) (lhc:get (binary base-url #"/delay/10")
+                                     (map 'timeout 1000))))  ; 1 second timeout
      (line (test-pat 'timeout (maps:get 'reason error)))
      'ok)))

@@ -50,18 +50,16 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           (url (binary base-url #"/get"))
-          (opts (map 'mode 'async 'backend 'httpc)))
-     ;; Issue async request
-     (line (test-pat `#(ok ,request-id)
-                     (lhc:get url opts)))
+          (opts (map 'mode 'async 'backend 'httpc))
+          ;; Issue async request
+          (`#(ok ,request-id) (lhc:get url opts)))
      ;; Verify we got a request ID
      (line (test-pat 'true (is_reference request-id)))
      ;; Await response
-     (line (test-pat `#(ok ,response)
-                     (lhc:await request-id 10000)))
-     ;; Verify response
-     (line (test-pat 200 (maps:get 'status response)))
-     'ok)))
+     (let ((`#(ok ,response) (lhc:await request-id 10000)))
+       ;; Verify response
+       (line (test-pat 200 (maps:get 'status response)))
+       'ok))))
 
 ;;; Async POST Tests
 
@@ -74,15 +72,13 @@
           (body #"{\"async\": \"test\"}")
           (opts (map 'mode 'async
                      'backend 'gun
-                     'headers '(#(<<"content-type">> <<"application/json">>)))))
-     ;; Issue async POST
-     (line (test-pat `#(ok ,request-id)
-                     (lhc:post url body opts)))
+                     'headers '(#(<<"content-type">> <<"application/json">>))))
+          ;; Issue async POST
+          (`#(ok ,request-id) (lhc:post url body opts)))
      ;; Await response
-     (line (test-pat `#(ok ,response)
-                     (lhc:await request-id 10000)))
-     (line (test-pat 200 (maps:get 'status response)))
-     'ok)))
+     (let ((`#(ok ,response) (lhc:await request-id 10000)))
+       (line (test-pat 200 (maps:get 'status response)))
+       'ok))))
 
 ;;; Await Tests
 
@@ -92,15 +88,13 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           (url (binary base-url #"/get"))
-          (opts (map 'mode 'async)))
-     ;; Start async request
-     (line (test-pat `#(ok ,req-id)
-                     (lhc:get url opts)))
+          (opts (map 'mode 'async))
+          ;; Start async request
+          (`#(ok ,req-id) (lhc:get url opts)))
      ;; Await with long timeout
-     (line (test-pat `#(ok ,response)
-                     (lhc:await req-id 15000)))
-     (line (test-pat 200 (maps:get 'status response)))
-     'ok)))
+     (let ((`#(ok ,response) (lhc:await req-id 15000)))
+       (line (test-pat 200 (maps:get 'status response)))
+       'ok))))
 
 ;;; Timeout Tests
 
@@ -111,15 +105,13 @@
    (let* ((base-url (config 'base_url config))
           ;; Use delay endpoint that takes 10 seconds
           (url (binary base-url #"/delay/10"))
-          (opts (map 'mode 'async 'backend 'httpc)))
-     ;; Start async request
-     (line (test-pat `#(ok ,req-id)
-                     (lhc:get url opts)))
+          (opts (map 'mode 'async 'backend 'httpc))
+          ;; Start async request
+          (`#(ok ,req-id) (lhc:get url opts)))
      ;; Await with short timeout (should timeout)
-     (line (test-pat `#(error ,error)
-                     (lhc:await req-id 1000)))
-     (line (test-pat 'timeout (maps:get 'reason error)))
-     'ok)))
+     (let ((`#(error ,error) (lhc:await req-id 1000)))
+       (line (test-pat 'timeout (maps:get 'reason error)))
+       'ok))))
 
 ;;; Multiple Async Requests
 
@@ -131,25 +123,19 @@
           (url1 (binary base-url #"/get?req=1"))
           (url2 (binary base-url #"/get?req=2"))
           (url3 (binary base-url #"/get?req=3"))
-          (opts (map 'mode 'async 'backend 'gun)))
-     ;; Start multiple async requests
-     (line (test-pat `#(ok ,req1)
-                     (lhc:get url1 opts)))
-     (line (test-pat `#(ok ,req2)
-                     (lhc:get url2 opts)))
-     (line (test-pat `#(ok ,req3)
-                     (lhc:get url3 opts)))
+          (opts (map 'mode 'async 'backend 'gun))
+          ;; Start multiple async requests
+          (`#(ok ,req1) (lhc:get url1 opts)))
+     (let ((`#(ok ,req2) (lhc:get url2 opts)))
+       (let ((`#(ok ,req3) (lhc:get url3 opts)))
 
-     ;; Await all responses
-     (line (test-pat `#(ok ,resp1)
-                     (lhc:await req1 10000)))
-     (line (test-pat `#(ok ,resp2)
-                     (lhc:await req2 10000)))
-     (line (test-pat `#(ok ,resp3)
-                     (lhc:await req3 10000)))
+         ;; Await all responses
+         (let ((`#(ok ,resp1) (lhc:await req1 10000)))
+           (let ((`#(ok ,resp2) (lhc:await req2 10000)))
+             (let ((`#(ok ,resp3) (lhc:await req3 10000)))
 
-     ;; Verify all succeeded
-     (line (test-pat 200 (maps:get 'status resp1)))
-     (line (test-pat 200 (maps:get 'status resp2)))
-     (line (test-pat 200 (maps:get 'status resp3)))
-     'ok)))
+               ;; Verify all succeeded
+               (line (test-pat 200 (maps:get 'status resp1)))
+               (line (test-pat 200 (maps:get 'status resp2)))
+               (line (test-pat 200 (maps:get 'status resp3)))
+               'ok))))))))
