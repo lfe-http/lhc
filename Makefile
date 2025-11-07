@@ -22,6 +22,10 @@ build:
 test:
 	@rebar3 as test do compile, lfe ltest -tall
 
+clean:
+	@rebar3 clean
+	@rm -rf _build/*/lib/lhc
+
 .PHONY: docs
 docs: docs-clean
 	@echo "\nBuilding docs ...\n"
