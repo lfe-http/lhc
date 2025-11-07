@@ -120,7 +120,7 @@
           (url (list_to_binary (++ (binary_to_list base-url) "/post")))
           (body #"{\"test\": \"data\"}")
           (opts (map 'backend 'httpc
-                     'headers '(#(<<"content-type">> <<"application/json">>))))
+                     'headers '(#(#"content-type" #"application/json"))))
           ;; Test POST
           (`#(ok ,response) (lhc:post url body opts)))
      (line (test-pat 200 (maps:get 'status response)))
@@ -134,7 +134,7 @@
           (url (list_to_binary (++ (binary_to_list base-url) "/post")))
           (body #"{\"foo\": \"bar\"}")
           (opts (map 'backend 'gun
-                     'headers '(#(<<"content-type">> <<"application/json">>))))
+                     'headers '(#(#"content-type" #"application/json"))))
           ;; Test POST
           (`#(ok ,response) (lhc:post url body opts)))
      (line (test-pat 200 (maps:get 'status response)))
@@ -150,7 +150,7 @@
           (url (list_to_binary (++ (binary_to_list base-url) "/put")))
           (body #"{\"update\": \"data\"}")
           (opts (map 'backend 'httpc
-                     'headers '(#(<<"content-type">> <<"application/json">>))))
+                     'headers '(#(#"content-type" #"application/json"))))
           (`#(ok ,response) (lhc:put url body opts)))
      (line (test-pat 200 (maps:get 'status response)))
      'ok)))
@@ -163,7 +163,7 @@
           (url (list_to_binary (++ (binary_to_list base-url) "/put")))
           (body #"{\"update\": \"value\"}")
           (opts (map 'backend 'gun
-                     'headers '(#(<<"content-type">> <<"application/json">>))))
+                     'headers '(#(#"content-type" #"application/json"))))
           (`#(ok ,response) (lhc:put url body opts)))
      (line (test-pat 200 (maps:get 'status response)))
      'ok)))
@@ -200,8 +200,8 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/headers")))
-          (custom-headers '(#(<<"X-Test-Header">> <<"test-value">>)
-                           #(<<"X-Custom">> <<"custom-value">>)))
+          (custom-headers '(#(#"X-Test-Header" #"test-value")
+                           #(#"X-Custom" #"custom-value")))
           (opts (map 'headers custom-headers))
           ;; Test with httpc
           (`#(ok ,response1) (lhc:get url (maps:put 'backend 'httpc opts))))

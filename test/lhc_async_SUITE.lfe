@@ -72,7 +72,7 @@
           (body #"{\"async\": \"test\"}")
           (opts (map 'mode 'async
                      'backend 'gun
-                     'headers '(#(<<"content-type">> <<"application/json">>))))
+                     'headers '(#(#"content-type" #"application/json"))))
           ;; Issue async POST
           (`#(ok ,request-id) (lhc:post url body opts)))
      ;; Await response

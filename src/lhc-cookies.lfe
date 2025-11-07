@@ -123,7 +123,7 @@
 
   Example:
     (lhc-cookies:store store
-                       '(<<\"session=abc; Path=/; HttpOnly\">>)
+                       '(#\"session=abc; Path=/; HttpOnly\")
                        \"https://example.com\")"
   ((store set-cookies uri)
    (case (lhc-util:parse-uri uri)
@@ -223,7 +223,7 @@
     cookies: List of cookie tuples from gun_cookies
 
   Returns:
-    Binary cookie header value (e.g., <<\"name1=value1; name2=value2\">>)"
+    Binary cookie header value (e.g., #\"name1=value1; name2=value2\")"
   ((cookies)
    (let ((cookie-strings
           (lists:map

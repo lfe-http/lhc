@@ -520,7 +520,7 @@
     method: LHC method atom (e.g., 'GET)
 
   Returns:
-    Binary method name (e.g., <<\"GET\">>)"
+    Binary method name (e.g., #\"GET\")"
   (('GET) #"GET")
   (('HEAD) #"HEAD")
   (('POST) #"POST")

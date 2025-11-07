@@ -127,8 +127,8 @@
           (store1 (lhc-cookies:init)))
 
      ;; Create a fake Set-Cookie header
-     (let ((set-cookie-headers '(#(<<"set-cookie">>
-                                   <<"testcookie=testvalue; Path=/; Domain=httpbin.org">>))))
+     (let ((set-cookie-headers '(#(#"set-cookie"
+                                   #"testcookie=testvalue; Path=/; Domain=httpbin.org"))))
 
        ;; Store cookie
        (let ((`#(ok ,store2) (lhc-cookies:store url set-cookie-headers store1)))

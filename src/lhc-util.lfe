@@ -172,8 +172,8 @@
 
   Returns:
     Map with keys: type, subtype, params
-    Example: #{type => <<\"text\">>, subtype => <<\"html\">>,
-              params => #{<<\"charset\">> => <<\"utf-8\">>}}"
+    Example: #{type => #\"text\", subtype => #\"html\",
+              params => #{#\"charset\" => #\"utf-8\"}}"
   ((value)
    (let* ((value-bin (ensure-binary value))
           (parts (binary:split value-bin #";" '(global trim_all)))

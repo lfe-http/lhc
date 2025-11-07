@@ -25,7 +25,7 @@
       ;; Upgrade to WebSocket
       (let ((`#(ok ,ws) (lhc-websocket:upgrade conn \"/\" (map))))
         ;; Send text frame
-        (lhc-websocket:send conn ws (map 'type 'text 'data <<\"Hello!\">>))
+        (lhc-websocket:send conn ws (map 'type 'text 'data #\"Hello!\"))
         ;; Receive echo
         (receive
           (`#(gun_ws ,c ,w ,frame)
@@ -184,13 +184,13 @@
 
   Examples:
     ;; Text frame
-    (lhc-websocket:send conn ws (map 'type 'text 'data <<\"Hello\">>))
+    (lhc-websocket:send conn ws (map 'type 'text 'data #\"Hello\"))
 
     ;; Binary frame
-    (lhc-websocket:send conn ws (map 'type 'binary 'data <<1 2 3>>))
+    (lhc-websocket:send conn ws (map 'type 'binary 'data (binary 1 2 3)))
 
     ;; Close with reason
-    (lhc-websocket:send conn ws (map 'type 'close 'code 1000 'reason <<\"Goodbye\">>))"
+    (lhc-websocket:send conn ws (map 'type 'close 'code 1000 'reason #\"Goodbye\"))"
   ((conn stream-ref frame)
    (let ((gun-frame (frame-to-gun frame)))
      (gun:ws_send conn stream-ref gun-frame)
