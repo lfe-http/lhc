@@ -163,8 +163,8 @@
        ;; Request with body
        (let ((stream-ref (gun:request conn gun-method gun-path gun-headers body)))
          (await-response conn stream-ref timeout))
-       ;; Request without body
-       (let ((stream-ref (gun:request conn gun-method gun-path gun-headers)))
+       ;; Request without body (must pass empty binary for body)
+       (let ((stream-ref (gun:request conn gun-method gun-path gun-headers #"")))
          (await-response conn stream-ref timeout))))))
 
 (defun do-request-async
@@ -188,8 +188,8 @@
        ;; Request with body
        (let ((stream-ref (gun:request conn gun-method gun-path gun-headers body)))
          `#(ok ,stream-ref))
-       ;; Request without body
-       (let ((stream-ref (gun:request conn gun-method gun-path gun-headers)))
+       ;; Request without body (must pass empty binary for body)
+       (let ((stream-ref (gun:request conn gun-method gun-path gun-headers #"")))
          `#(ok ,stream-ref))))))
 
 (defun has-body?

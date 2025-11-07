@@ -135,7 +135,9 @@
   ((uri body headers)
    (let* ((url (binary_to_list (lhc-util:ensure-binary uri)))
           (norm-headers (headers-to-httpc headers)))
-     (if (or (is_binary body) (is_list body))
+     ;; Check if body is non-empty (empty binary/list should be treated as no body)
+     (if (andalso (or (is_binary body) (is_list body))
+                  (> (iolist_size body) 0))
        ;; Request with body
        (let* ((content-type (get-content-type headers))
               (body-str (body-to-httpc body)))
