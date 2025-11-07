@@ -86,7 +86,7 @@
   (['doc] "Test GET request with httpc backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/get?foo=bar"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/get?foo=bar")))
           (opts (map 'backend 'httpc))
           ;; Test successful GET
           (`#(ok ,response) (lhc:get url opts)))
@@ -101,7 +101,7 @@
   (['doc] "Test GET request with gun backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/get?test=value"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/get?test=value")))
           (opts (map 'backend 'gun))
           ;; Test successful GET
           (`#(ok ,response) (lhc:get url opts)))
@@ -117,7 +117,7 @@
   (['doc] "Test POST request with httpc backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/post"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/post")))
           (body #"{\"test\": \"data\"}")
           (opts (map 'backend 'httpc
                      'headers '(#(<<"content-type">> <<"application/json">>))))
@@ -131,7 +131,7 @@
   (['doc] "Test POST request with gun backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/post"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/post")))
           (body #"{\"foo\": \"bar\"}")
           (opts (map 'backend 'gun
                      'headers '(#(<<"content-type">> <<"application/json">>))))
@@ -147,7 +147,7 @@
   (['doc] "Test PUT request with httpc backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/put"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/put")))
           (body #"{\"update\": \"data\"}")
           (opts (map 'backend 'httpc
                      'headers '(#(<<"content-type">> <<"application/json">>))))
@@ -160,7 +160,7 @@
   (['doc] "Test PUT request with gun backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/put"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/put")))
           (body #"{\"update\": \"value\"}")
           (opts (map 'backend 'gun
                      'headers '(#(<<"content-type">> <<"application/json">>))))
@@ -175,7 +175,7 @@
   (['doc] "Test DELETE request with httpc backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/delete"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/delete")))
           (opts (map 'backend 'httpc))
           (`#(ok ,response) (lhc:delete url opts)))
      (line (test-pat 200 (maps:get 'status response)))
@@ -186,7 +186,7 @@
   (['doc] "Test DELETE request with gun backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/delete"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/delete")))
           (opts (map 'backend 'gun))
           (`#(ok ,response) (lhc:delete url opts)))
      (line (test-pat 200 (maps:get 'status response)))
@@ -199,7 +199,7 @@
   (['doc] "Test custom headers in requests")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/headers"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/headers")))
           (custom-headers '(#(<<"X-Test-Header">> <<"test-value">>)
                            #(<<"X-Custom">> <<"custom-value">>)))
           (opts (map 'headers custom-headers))
@@ -220,15 +220,15 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           ;; Test 404
-          (`#(ok ,resp404) (lhc:get (binary base-url #"/status/404") (map))))
+          (`#(ok ,resp404) (lhc:get (list_to_binary (++ (binary_to_list base-url) "/status/404")) (map))))
      (line (test-pat 404 (maps:get 'status resp404)))
 
      ;; Test 500
-     (let ((`#(ok ,resp500) (lhc:get (binary base-url #"/status/500") (map))))
+     (let ((`#(ok ,resp500) (lhc:get (list_to_binary (++ (binary_to_list base-url) "/status/500")) (map))))
        (line (test-pat 500 (maps:get 'status resp500)))
 
        ;; Test 201
-       (let ((`#(ok ,resp201) (lhc:get (binary base-url #"/status/201") (map))))
+       (let ((`#(ok ,resp201) (lhc:get (list_to_binary (++ (binary_to_list base-url) "/status/201")) (map))))
          (line (test-pat 201 (maps:get 'status resp201)))
          'ok)))))
 
@@ -257,7 +257,7 @@
    (let* ((base-url (config 'base_url config))
           ;; Test timeout on slow endpoint
           ;; httpbin /delay/{n} delays response for n seconds
-          (`#(error ,error) (lhc:get (binary base-url #"/delay/10")
+          (`#(error ,error) (lhc:get (list_to_binary (++ (binary_to_list base-url) "/delay/10"))
                                      (map 'timeout 1000))))  ; 1 second timeout
      (line (test-pat 'timeout (maps:get 'reason error)))
      'ok)))

@@ -69,8 +69,8 @@
   (['doc] "Test that cookies persist across multiple requests")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (set-url (binary base-url #"/cookies/set?testcookie=testvalue"))
-          (get-url (binary base-url #"/cookies"))
+          (set-url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?testcookie=testvalue")))
+          (get-url (list_to_binary (++ (binary_to_list base-url) "/cookies")))
           (store (lhc-cookies:init))
           ;; First request: set a cookie
           ;; Note: httpbin /cookies/set redirects, so we get the Set-Cookie header
@@ -100,7 +100,7 @@
   (['doc] "Test Set-Cookie header parsing")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/cookies/set?name1=value1"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?name1=value1")))
           (store (lhc-cookies:init))
           ;; Make request that sets cookies
           (`#(ok ,response) (lhc:get url (map 'backend 'gun))))
@@ -123,7 +123,7 @@
   (['doc] "Test cookie store operations: init, store, query, list, clear")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/cookies"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/cookies")))
           (store1 (lhc-cookies:init)))
 
      ;; Create a fake Set-Cookie header
@@ -157,8 +157,8 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           ;; Set multiple cookies in one request
-          (set-url (binary base-url #"/cookies/set?cookie1=value1&cookie2=value2"))
-          (get-url (binary base-url #"/cookies"))
+          (set-url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?cookie1=value1&cookie2=value2")))
+          (get-url (list_to_binary (++ (binary_to_list base-url) "/cookies")))
           (store (lhc-cookies:init))
           ;; Set multiple cookies
           (`#(ok ,resp1) (lhc:get set-url (map 'backend 'gun))))
@@ -183,7 +183,7 @@
   (['doc] "Test cookie management with httpc backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/cookies/set?httpc_cookie=httpc_value"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?httpc_cookie=httpc_value")))
           (store (lhc-cookies:init))
           ;; Make request with httpc
           (`#(ok ,response) (lhc:get url (map 'backend 'httpc))))
@@ -204,7 +204,7 @@
   (['doc] "Test cookie management with gun backend")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/cookies/set?gun_cookie=gun_value"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?gun_cookie=gun_value")))
           (store (lhc-cookies:init))
           ;; Make request with gun
           (`#(ok ,response) (lhc:get url (map 'backend 'gun))))

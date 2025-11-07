@@ -49,7 +49,7 @@
   (['doc] "Test async GET request")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/get"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/get")))
           (opts (map 'mode 'async 'backend 'httpc))
           ;; Issue async request
           (`#(ok ,request-id) (lhc:get url opts)))
@@ -68,7 +68,7 @@
   (['doc] "Test async POST request")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/post"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/post")))
           (body #"{\"async\": \"test\"}")
           (opts (map 'mode 'async
                      'backend 'gun
@@ -87,7 +87,7 @@
   (['doc] "Test await with different timeouts")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (binary base-url #"/get"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/get")))
           (opts (map 'mode 'async))
           ;; Start async request
           (`#(ok ,req-id) (lhc:get url opts)))
@@ -104,7 +104,7 @@
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
           ;; Use delay endpoint that takes 10 seconds
-          (url (binary base-url #"/delay/10"))
+          (url (list_to_binary (++ (binary_to_list base-url) "/delay/10")))
           (opts (map 'mode 'async 'backend 'httpc))
           ;; Start async request
           (`#(ok ,req-id) (lhc:get url opts)))
@@ -120,9 +120,9 @@
   (['doc] "Test multiple concurrent async requests")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url1 (binary base-url #"/get?req=1"))
-          (url2 (binary base-url #"/get?req=2"))
-          (url3 (binary base-url #"/get?req=3"))
+          (url1 (list_to_binary (++ (binary_to_list base-url) "/get?req=1")))
+          (url2 (list_to_binary (++ (binary_to_list base-url) "/get?req=2")))
+          (url3 (list_to_binary (++ (binary_to_list base-url) "/get?req=3")))
           (opts (map 'mode 'async 'backend 'gun))
           ;; Start multiple async requests
           (`#(ok ,req1) (lhc:get url1 opts)))
