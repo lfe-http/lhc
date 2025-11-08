@@ -37,6 +37,14 @@
   (('httpc `#(error ,reason))
    (normalize-httpc-error reason))
 
+  ;; httpc errors (direct reason, not wrapped in error tuple)
+  (('httpc reason) (when (is_tuple reason))
+   (normalize-httpc-error reason))
+
+  ;; httpc errors (atom reasons)
+  (('httpc reason) (when (is_atom reason))
+   (normalize-httpc-error reason))
+
   ;; gun errors
   (('gun `#(error ,reason))
    (normalize-gun-error reason))
@@ -85,12 +93,17 @@
   (('timeout)
    (make-error 'timeout "Request timeout" 'httpc 'timeout))
 
-  ;; SSL/TLS errors
+  ;; Connection failures - extract the actual error from failed_connect
   ((`#(failed_connect ,details))
-   (make-error 'ssl
-               (extract-ssl-message details)
-               'httpc
-               `#(failed_connect ,details)))
+   (let ((actual-error (extract-inet-error details)))
+     (if (=/= actual-error 'undefined)
+       ;; Re-normalize the extracted error
+       (normalize-httpc-error actual-error)
+       ;; Fall back to SSL error if we can't extract inet error
+       (make-error 'ssl
+                   (extract-ssl-message details)
+                   'httpc
+                   `#(failed_connect ,details)))))
 
   ;; Protocol errors
   ((`#(bad_status_line ,line))
@@ -190,6 +203,14 @@
                     (integer_to_list status)))
                'gun
                `#(ws_upgrade_failed ,status)))
+
+  ;; Nested error tuples (unwrap and re-normalize)
+  ((`#(error ,nested-reason))
+   (normalize-gun-error nested-reason))
+
+  ;; inet error tuples
+  ((`#(error ,error-atom ,_details))
+   (normalize-gun-error error-atom))
 
   ;; Unknown gun errors
   ((reason)
@@ -331,3 +352,18 @@
    (list_to_binary
     (++ "SSL connection failed: "
         (format-term details)))))
+
+(defun extract-inet-error
+  "Extract the actual inet error from failed_connect details.
+
+  Details format: [{to_address, ...}, {inet, [inet], Error}]
+  Returns: Error atom or 'undefined"
+  ((details) (when (is_list details))
+   (case (lists:keyfind 'inet 1 details)
+     (`#(inet ,_transport ,error)
+      error)
+     (_
+      'undefined)))
+
+  ((details)
+   'undefined))

@@ -370,6 +370,8 @@
   ((uri-map opts)
    (let* ((gun-opts (maps:get 'gun-opts opts (map)))
           (cookie-store (maps:get 'cookie-store opts 'undefined))
+          (scheme (maps:get 'scheme uri-map))
+          (is-websocket (orelse (=:= scheme #"ws") (=:= scheme #"wss")))
           (transport (get-transport uri-map))
           (protocols (maps:get 'protocols gun-opts
                                (get-default-protocols transport)))
@@ -382,8 +384,9 @@
                        #(retry ,retry)
                        #(retry_timeout ,retry-timeout)
                        #(connect_timeout ,connect-timeout)))
-          ;; Add cookie-store if provided
-          (opts-with-cookies (if (=/= cookie-store 'undefined)
+          ;; Add cookie-store only for HTTP(S), not WebSocket
+          (opts-with-cookies (if (andalso (=/= cookie-store 'undefined)
+                                          (not is-websocket))
                                (cons `#(cookie_store ,cookie-store) base-opts)
                                base-opts)))
      (maps:merge

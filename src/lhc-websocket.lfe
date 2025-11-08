@@ -42,7 +42,11 @@
    ;; Frame operations
    (send 3)
    (send-text 3)
+   (send-text 4)
    (send-binary 3)
+   (send-binary 4)
+   (send-ping 4)
+   (send-close 5)
    (ping 2)
    (pong 2)
 
@@ -209,6 +213,20 @@
   ((conn stream-ref text)
    (send conn stream-ref (text-frame text))))
 
+(defun send-text
+  "Send a text frame (4-arg version with opts for compatibility).
+
+  Args:
+    conn: Gun connection pid
+    stream-ref: WebSocket stream reference
+    text: Text data (binary or string)
+    opts: Options map (currently unused)
+
+  Returns:
+    ok"
+  ((conn stream-ref text _opts)
+   (send conn stream-ref (text-frame text))))
+
 (defun send-binary
   "Send a binary frame.
 
@@ -220,6 +238,20 @@
   Returns:
     ok"
   ((conn stream-ref data)
+   (send conn stream-ref (binary-frame data))))
+
+(defun send-binary
+  "Send a binary frame (4-arg version with opts for compatibility).
+
+  Args:
+    conn: Gun connection pid
+    stream-ref: WebSocket stream reference
+    data: Binary data
+    opts: Options map (currently unused)
+
+  Returns:
+    ok"
+  ((conn stream-ref data _opts)
    (send conn stream-ref (binary-frame data))))
 
 (defun ping
@@ -245,6 +277,37 @@
     ok"
   ((conn stream-ref)
    (send conn stream-ref (pong-frame))))
+
+(defun send-ping
+  "Send a ping frame with optional data.
+
+  Args:
+    conn: Gun connection pid
+    stream-ref: WebSocket stream reference
+    data: Ping data (binary)
+    opts: Options map (currently unused)
+
+  Returns:
+    ok"
+  ((conn stream-ref _data _opts)
+   ;; Note: Gun's ping frame doesn't support custom data
+   ;; Ignoring the data parameter and sending standard ping
+   (send conn stream-ref (ping-frame))))
+
+(defun send-close
+  "Send a close frame with code and reason.
+
+  Args:
+    conn: Gun connection pid
+    stream-ref: WebSocket stream reference
+    code: Close code (integer)
+    reason: Close reason (binary or string)
+    opts: Options map (currently unused)
+
+  Returns:
+    ok"
+  ((conn stream-ref code reason _opts)
+   (send conn stream-ref (close-frame code reason))))
 
 ;;; ===================================================================
 ;;; Frame Handling
