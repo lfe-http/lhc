@@ -32,10 +32,14 @@
   "Initialize suite"
   (application:ensure_all_started 'gun)
   (application:ensure_all_started 'ssl)
-  ;; Use echo.websocket.org for testing
-  (cons `#(ws_url ,(binary "wss://echo.websocket.org")) config))
+  ;; Start local WebSocket test server
+  (let ((`#(ok ,port) (ws_test_server:start 8080)))
+    ;; Use local server for testing
+    (cons `#(ws_url ,(binary "ws://localhost:8080")) config)))
 
 (defun end_per_suite (config)
+  "Clean up suite - stop WebSocket test server"
+  (ws_test_server:stop)
   'ok)
 
 (defun init_per_testcase (func config)
@@ -186,19 +190,19 @@
           (`#(ok ,ws) (lhc-websocket:upgrade conn "/" (map) (map 'mode 'sync))))
 
      ;; Send ping frame
+     ;; Note: Both Gun and Cowboy handle ping/pong automatically at the protocol level
+     ;; The pong response is not surfaced to the application layer
      (line (test-pat 'ok
                      (lhc-websocket:send-ping conn ws #"ping-data" (map))))
 
-     ;; Await pong response
-     ;; Note: The server should respond with pong automatically
-     (let ((`#(ok ,frame) (lhc-websocket:await-frame conn ws 5000)))
+     ;; Send a text frame to verify connection is still active after ping
+     (line (test-pat 'ok
+                     (lhc-websocket:send-text conn ws #"ping-test" (map))))
 
-       ;; Verify we got pong frame
-       ;; Note: Some echo servers may echo ping as text, so we check for either
-       (let ((frame-type (maps:get 'type frame)))
-         (line (test-pat 'true
-                         (orelse (=:= frame-type 'pong)
-                                 (=:= frame-type 'text))))))
+     ;; Verify we get the text echo back (proves ping didn't break connection)
+     (let ((`#(ok ,frame) (lhc-websocket:await-frame conn ws 5000)))
+       (line (test-pat 'text (maps:get 'type frame)))
+       (line (test-pat #"ping-test" (maps:get 'data frame))))
 
      ;; Close connection
      (lhc:close conn)
