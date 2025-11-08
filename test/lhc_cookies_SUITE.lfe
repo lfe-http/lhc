@@ -1,5 +1,5 @@
 ;; Integration tests for LHC cookie management
-;; Uses httpbin.org cookie endpoints for testing
+;; Uses local test server cookie endpoints for testing
 
 (include-file "test_server.lfe")
 
@@ -28,9 +28,20 @@
   (application:ensure_all_started 'inets)
   (application:ensure_all_started 'gun)
   (application:ensure_all_started 'ssl)
-  (cons `#(base_url ,(binary "https://httpbin.org")) config))
+  (application:ensure_all_started 'cowboy)
+  ;; Start cookie store
+  (lhc-cookies:init)
+  ;; Start local test server
+  (case (lhc_test_server:start (maps:from_list config))
+    (`#(ok ,updated-config)
+     (maps:to_list updated-config))
+    (`#(error ,reason)
+     (: ct pal "Failed to start test server: ~p" `(,reason))
+     (: ct fail "Test server startup failed"))))
 
 (defun end_per_suite (config)
+  ;; Stop local test server
+  (lhc_test_server:stop (maps:from_list config))
   'ok)
 
 (defun init_per_testcase (func config)
@@ -62,14 +73,14 @@
   (['suite] ())
   (['doc] "Test Gun's automatic cookie handling - cookies are set and sent automatically")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           ;; Initialize cookie store
           (cookie-store (lhc-cookies:init))
           ;; Open connection WITH cookie store - Gun will handle cookies automatically
           (`#(ok ,conn) (lhc:open base-url (map 'backend 'gun
                                                 'cookie-store cookie-store))))
 
-     ;; First request: Set a cookie via httpbin's /cookies/set endpoint
+     ;; First request: Set a cookie via /cookies/set endpoint
      ;; Gun will automatically extract and store the Set-Cookie header
      (let ((`#(ok ,resp1) (lhc-gun:do-request-sync conn 'GET
                                                     "/cookies/set?testcookie=testvalue"
@@ -80,7 +91,7 @@
                                                       #"" '() (map))))
 
          ;; Verify the response body contains our cookie
-         ;; httpbin's /cookies endpoint returns JSON with our cookie
+         ;; The /cookies endpoint returns JSON with our cookie
          (let ((body (maps:get 'body resp2)))
            ;; Simple check: body should contain "testcookie" and "testvalue"
            ;; binary:match returns {Pos, Len} on match, nomatch on failure
@@ -94,7 +105,7 @@
   (['suite] ())
   (['doc] "Test that cookies persist across multiple requests in Gun")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (cookie-store (lhc-cookies:init))
           (`#(ok ,conn) (lhc:open base-url (map 'backend 'gun
                                                 'cookie-store cookie-store))))
@@ -127,10 +138,10 @@
   (['doc] "Test manual cookie inspection utilities for debugging")
   ([config] (when (is_list config))
    (let* ((store (lhc-cookies:init))
-          (url #"https://httpbin.org/cookies"))
+          (url #"http://localhost:8080/cookies"))
 
      ;; Manually store a cookie (for debugging/testing purposes)
-     (let ((set-cookies '(#"session=abc123; Path=/; Domain=httpbin.org")))
+     (let ((set-cookies '(#"session=abc123; Path=/; Domain=localhost")))
        (let ((`#(ok ,store2) (lhc-cookies:store store set-cookies url)))
 
          ;; Query what cookies would apply to this URL
@@ -156,12 +167,12 @@
   (['suite] ())
   (['doc] "Test cookie store operations: init, store, query, list, clear")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/cookies")))
           (store1 (lhc-cookies:init)))
 
      ;; Create a fake Set-Cookie header
-     (let ((set-cookie-headers '(#"testcookie=testvalue; Path=/; Domain=httpbin.org")))
+     (let ((set-cookie-headers '(#"testcookie=testvalue; Path=/; Domain=localhost")))
 
        ;; Store cookie
        (let ((`#(ok ,store2) (lhc-cookies:store store1 set-cookie-headers url)))

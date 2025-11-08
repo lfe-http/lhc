@@ -29,9 +29,18 @@
   (application:ensure_all_started 'inets)
   (application:ensure_all_started 'gun)
   (application:ensure_all_started 'ssl)
-  (cons `#(base_url ,(binary "https://httpbin.org")) config))
+  (application:ensure_all_started 'cowboy)
+  ;; Start local test server
+  (case (lhc_test_server:start (maps:from_list config))
+    (`#(ok ,updated-config)
+     (maps:to_list updated-config))
+    (`#(error ,reason)
+     (: ct pal "Failed to start test server: ~p" `(,reason))
+     (: ct fail "Test server startup failed"))))
 
 (defun end_per_suite (config)
+  ;; Stop local test server
+  (lhc_test_server:stop (maps:from_list config))
   'ok)
 
 (defun init_per_testcase (func config)
@@ -48,7 +57,7 @@
   (['suite] ())
   (['doc] "Test async GET request")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/get")))
           (opts (map 'mode 'async 'backend 'httpc))
           ;; Issue async request
@@ -67,7 +76,7 @@
   (['suite] ())
   (['doc] "Test async POST request")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/post")))
           (body #"{\"async\": \"test\"}")
           (opts (map 'mode 'async
@@ -86,7 +95,7 @@
   (['suite] ())
   (['doc] "Test await with different timeouts")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/get")))
           (opts (map 'mode 'async))
           ;; Start async request
@@ -102,7 +111,7 @@
   (['suite] ())
   (['doc] "Test async request timeout")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           ;; Use delay endpoint that takes 10 seconds
           (url (list_to_binary (++ (binary_to_list base-url) "/delay/10")))
           (opts (map 'mode 'async 'backend 'httpc))
@@ -119,7 +128,7 @@
   (['suite] ())
   (['doc] "Test multiple concurrent async requests")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url1 (list_to_binary (++ (binary_to_list base-url) "/get?req=1")))
           (url2 (list_to_binary (++ (binary_to_list base-url) "/get?req=2")))
           (url3 (list_to_binary (++ (binary_to_list base-url) "/get?req=3")))

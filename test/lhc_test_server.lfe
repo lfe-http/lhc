@@ -26,11 +26,11 @@
     {ok, updated-config} with server info added"
   (let* ((port (maps:get 'port config (get-random-port)))
          (dispatch (cowboy_router:compile
-                    `(#(_ (,(route-list)))))))
+                    `(#(_ ,(route-list))))))
     ;; Start Cowboy HTTP server
     (case (cowboy:start_clear 'lhc_test_http
                               `(#(port ,port))
-                              `#(env #(dispatch ,dispatch)))
+                              (map 'env (map 'dispatch dispatch)))
       (`#(ok ,pid)
        ;; Add server info to config
        `#(ok ,(maps:merge config
@@ -94,6 +94,12 @@
     ;; POST endpoint
     #("/post" lhc_test_handler (#(method post)))
 
+    ;; PUT endpoint
+    #("/put" lhc_test_handler (#(method put)))
+
+    ;; DELETE endpoint
+    #("/delete" lhc_test_handler (#(method delete)))
+
     ;; Status code endpoints
     #("/status/:code" lhc_test_handler (#(type status)))
 
@@ -103,6 +109,7 @@
     ;; Cookie endpoints
     #("/cookies/set" lhc_test_handler (#(type set_cookies)))
     #("/cookies/get" lhc_test_handler (#(type get_cookies)))
+    #("/cookies" lhc_test_handler (#(type get_cookies)))
 
     ;; Redirect endpoint
     #("/redirect/:count" lhc_test_handler (#(type redirect)))

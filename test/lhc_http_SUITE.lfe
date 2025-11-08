@@ -1,5 +1,5 @@
 ;; Integration tests for LHC HTTP functionality
-;; Uses httpbin.org for real HTTP testing
+;; Uses local Cowboy test server for HTTP testing
 
 (include-file "test_server.lfe")
 
@@ -51,11 +51,20 @@
   (application:ensure_all_started 'gun)
   ;; Start ssl
   (application:ensure_all_started 'ssl)
-  ;; Add test base URL to config
-  (cons `#(base_url ,(binary "https://httpbin.org")) config))
+  ;; Start cowboy for test server
+  (application:ensure_all_started 'cowboy)
+  ;; Start local test server
+  (case (lhc_test_server:start (maps:from_list config))
+    (`#(ok ,updated-config)
+     (maps:to_list updated-config))
+    (`#(error ,reason)
+     (: ct pal "Failed to start test server: ~p" `(,reason))
+     (: ct fail "Test server startup failed"))))
 
 (defun end_per_suite (config)
   "Clean up suite resources"
+  ;; Stop local test server
+  (lhc_test_server:stop (maps:from_list config))
   'ok)
 
 (defun init_per_group
@@ -85,7 +94,7 @@
   (['suite] ())
   (['doc] "Test GET request with httpc backend")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/get?foo=bar")))
           (opts (map 'backend 'httpc))
           ;; Test successful GET
@@ -100,7 +109,7 @@
   (['suite] ())
   (['doc] "Test GET request with gun backend")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/get?test=value")))
           (opts (map 'backend 'gun))
           ;; Test successful GET
@@ -116,7 +125,7 @@
   (['suite] ())
   (['doc] "Test POST request with httpc backend")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/post")))
           (body #"{\"test\": \"data\"}")
           (opts (map 'backend 'httpc
@@ -130,7 +139,7 @@
   (['suite] ())
   (['doc] "Test POST request with gun backend")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/post")))
           (body #"{\"foo\": \"bar\"}")
           (opts (map 'backend 'gun
@@ -146,7 +155,7 @@
   (['suite] ())
   (['doc] "Test PUT request with httpc backend")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/put")))
           (body #"{\"update\": \"data\"}")
           (opts (map 'backend 'httpc
@@ -159,7 +168,7 @@
   (['suite] ())
   (['doc] "Test PUT request with gun backend")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/put")))
           (body #"{\"update\": \"value\"}")
           (opts (map 'backend 'gun
@@ -174,7 +183,7 @@
   (['suite] ())
   (['doc] "Test DELETE request with httpc backend")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/delete")))
           (opts (map 'backend 'httpc))
           (`#(ok ,response) (lhc:delete url opts)))
@@ -185,7 +194,7 @@
   (['suite] ())
   (['doc] "Test DELETE request with gun backend")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/delete")))
           (opts (map 'backend 'gun))
           (`#(ok ,response) (lhc:delete url opts)))
@@ -198,7 +207,7 @@
   (['suite] ())
   (['doc] "Test custom headers in requests")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/headers")))
           (custom-headers '(#(#"X-Test-Header" #"test-value")
                            #(#"X-Custom" #"custom-value")))
@@ -218,7 +227,7 @@
   (['suite] ())
   (['doc] "Test various HTTP status codes")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           ;; Test 404
           (`#(ok ,resp404) (lhc:get (list_to_binary (++ (binary_to_list base-url) "/status/404")) (map))))
      (line (test-pat 404 (maps:get 'status resp404)))
@@ -264,10 +273,10 @@
   (['suite] ())
   (['doc] "Test timeout handling")
   ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
+   (let* ((base-url (config 'test_server_url config))
           (url (list_to_binary (++ (binary_to_list base-url) "/delay/10")))
           ;; Test timeout on slow endpoint
-          ;; httpbin /delay/{n} delays response for n seconds
+          ;; The /delay/{n} endpoint delays response for n seconds
           (result (lhc:get url (map 'timeout 1000))))  ; 1 second timeout
      (case result
        (`#(error ,error)
