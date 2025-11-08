@@ -54,7 +54,7 @@
   ;; Start cowboy for test server
   (application:ensure_all_started 'cowboy)
   ;; Start local test server
-  (case (lhc_test_server:start (maps:from_list config))
+  (case (lhc-test-server:start (maps:from_list config))
     (`#(ok ,updated-config)
      (maps:to_list updated-config))
     (`#(error ,reason)
@@ -64,7 +64,7 @@
 (defun end_per_suite (config)
   "Clean up suite resources"
   ;; Stop local test server
-  (lhc_test_server:stop (maps:from_list config))
+  (lhc-test-server:stop (maps:from_list config))
   'ok)
 
 (defun init_per_group

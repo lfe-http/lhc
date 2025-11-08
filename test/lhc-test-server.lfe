@@ -1,4 +1,4 @@
-(defmodule lhc_test_server
+(defmodule lhc-test-server
   "Simple HTTP test server for integration testing.
 
   This module provides a lightweight HTTP server for testing HTTP client
@@ -86,41 +86,41 @@
     List of Cowboy route specifications"
   '(
     ;; Basic echo endpoint
-    #("/echo" lhc_test_handler ())
+    #("/echo" lhc-test-handler ())
 
     ;; GET endpoint
-    #("/get" lhc_test_handler (#(method get)))
+    #("/get" lhc-test-handler (#(method get)))
 
     ;; POST endpoint
-    #("/post" lhc_test_handler (#(method post)))
+    #("/post" lhc-test-handler (#(method post)))
 
     ;; PUT endpoint
-    #("/put" lhc_test_handler (#(method put)))
+    #("/put" lhc-test-handler (#(method put)))
 
     ;; DELETE endpoint
-    #("/delete" lhc_test_handler (#(method delete)))
+    #("/delete" lhc-test-handler (#(method delete)))
 
     ;; Status code endpoints
-    #("/status/:code" lhc_test_handler (#(type status)))
+    #("/status/:code" lhc-test-handler (#(type status)))
 
     ;; Delay endpoint
-    #("/delay/:seconds" lhc_test_handler (#(type delay)))
+    #("/delay/:seconds" lhc-test-handler (#(type delay)))
 
     ;; Cookie endpoints
-    #("/cookies/set" lhc_test_handler (#(type set_cookies)))
-    #("/cookies/get" lhc_test_handler (#(type get_cookies)))
-    #("/cookies" lhc_test_handler (#(type get_cookies)))
+    #("/cookies/set" lhc-test-handler (#(type set_cookies)))
+    #("/cookies/get" lhc-test-handler (#(type get_cookies)))
+    #("/cookies" lhc-test-handler (#(type get_cookies)))
 
     ;; Redirect endpoint
-    #("/redirect/:count" lhc_test_handler (#(type redirect)))
+    #("/redirect/:count" lhc-test-handler (#(type redirect)))
 
     ;; Headers endpoint
-    #("/headers" lhc_test_handler (#(type headers)))
+    #("/headers" lhc-test-handler (#(type headers)))
 
     ;; WebSocket endpoint
-    #("/ws" lhc_test_ws_handler ())
+    #("/ws" lhc-test-ws-handler ())
     ))
 
-;; Note: The actual handlers (lhc_test_handler, lhc_test_ws_handler)
+;; Note: The actual handlers (lhc-test-handler, lhc-test-ws-handler)
 ;; would need to be implemented in Erlang or as separate modules.
 ;; For now, this provides the structure.
