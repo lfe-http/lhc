@@ -239,14 +239,24 @@
   (['doc] "Test error handling for invalid URLs and connection failures")
   ([config] (when (is_list config))
    ;; Test invalid domain
-   (let ((`#(error ,error1) (lhc:get #"http://this-domain-does-not-exist-12345.com" (map))))
-     (line (test-pat 'true (is_map error1)))
-     (line (test-pat 'connection (maps:get 'reason error1)))
+   (let ((result1 (lhc:get #"http://this-domain-does-not-exist-12345.com" (map))))
+     (case result1
+       (`#(error ,error1)
+        (line (test-pat 'true (is_map error1)))
+        (line (test-pat 'connection (maps:get 'reason error1)))
 
-     ;; Test connection refused
-     (let ((`#(error ,error2) (lhc:get #"http://localhost:9" (map 'timeout 1000))))
-       (line (test-pat 'true (is_map error2)))
-       'ok))))
+        ;; Test connection refused
+        (let ((result2 (lhc:get #"http://localhost:9" (map 'timeout 1000))))
+          (case result2
+            (`#(error ,error2)
+             (line (test-pat 'true (is_map error2)))
+             'ok)
+            (_
+             (: ct pal "ERROR: Expected error tuple, got: ~p" `(,result2))
+             (: ct fail "Did not get error tuple")))))
+       (_
+        (: ct pal "ERROR: Expected error tuple for invalid domain, got: ~p" `(,result1))
+        (: ct fail "Did not get error tuple for invalid domain"))))))
 
 ;;; Timeout Tests
 
@@ -255,9 +265,14 @@
   (['doc] "Test timeout handling")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
+          (url (list_to_binary (++ (binary_to_list base-url) "/delay/10")))
           ;; Test timeout on slow endpoint
           ;; httpbin /delay/{n} delays response for n seconds
-          (`#(error ,error) (lhc:get (list_to_binary (++ (binary_to_list base-url) "/delay/10"))
-                                     (map 'timeout 1000))))  ; 1 second timeout
-     (line (test-pat 'timeout (maps:get 'reason error)))
-     'ok)))
+          (result (lhc:get url (map 'timeout 1000))))  ; 1 second timeout
+     (case result
+       (`#(error ,error)
+        (line (test-pat 'timeout (maps:get 'reason error)))
+        'ok)
+       (_
+        (: ct pal "ERROR: Expected timeout error, got: ~p" `(,result))
+        (: ct fail "Did not get timeout error"))))))

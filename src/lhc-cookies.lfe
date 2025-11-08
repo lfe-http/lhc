@@ -1,21 +1,39 @@
 (defmodule lhc-cookies
   "Cookie management for LHC.
 
-  This module provides a unified interface for HTTP cookie management,
-  wrapping gun's cookie store implementation. Cookies can be automatically
-  handled in requests and responses when a cookie store is configured.
+  This module provides cookie store initialization and management utilities.
+  When using the gun backend, cookies are handled AUTOMATICALLY by Gun when
+  you configure a cookie store on your connection.
+
+  AUTOMATIC Cookie Handling (Recommended - Gun Backend):
+
+    Gun's cookie system automatically extracts Set-Cookie headers from responses
+    and adds Cookie headers to subsequent requests. Just pass a cookie store
+    when opening a connection:
+
+    ;; Initialize cookie store
+    (let ((store (lhc-cookies:init)))
+      ;; Open connection WITH cookie store
+      (let ((`#(ok ,conn) (lhc:open \"https://example.com\"
+                                    (map 'backend 'gun
+                                         'cookie-store store))))
+        ;; Make requests - cookies handled automatically!
+        (lhc-gun:do-request-sync conn 'GET \"/login\" #\"\" '() (map))
+        (lhc-gun:do-request-sync conn 'GET \"/profile\" #\"\" '() (map))
+        ;; Cookies from /login are automatically sent to /profile
+        (lhc:close conn)))
+
+  MANUAL Cookie Management (Advanced Use Cases):
+
+    Use the query/store/list-all functions for:
+    - Debugging cookies
+    - Inspecting cookie store contents
+    - Manual cookie injection from external sources
+    - Custom cookie workflows
 
   Cookie Store Types:
   - gun_cookies_list: In-memory cookie store (default)
-  - Custom implementations possible
-
-  Usage:
-    ;; Initialize cookie store
-    (let ((store (lhc-cookies:init (map))))
-      ;; Make request with cookies
-      (lhc:get uri (map 'cookie-store store))
-      ;; Cookies are automatically sent and stored
-      ...)"
+  - Custom implementations possible (for persistence, sharing, etc.)"
   (export
    ;; Cookie store management
    (init 0)

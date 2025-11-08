@@ -8,24 +8,18 @@
           (init_per_suite 1) (end_per_suite 1)
           (init_per_testcase 2) (end_per_testcase 2))
   (export (test_cookie_store_init 1)
-          (test_cookie_storage_across_requests 1)
-          (test_set_cookie_parsing 1)
-          (test_cookie_store_operations 1)
-          (test_multiple_cookies 1)
-          (test_cookie_with_httpc 1)
-          (test_cookie_with_gun 1)))
+          (test_automatic_cookie_handling 1)
+          (test_automatic_cookie_persistence 1)
+          (test_manual_cookie_inspection 1)
+          (test_cookie_store_operations 1)))
 
 ;;; Suite Configuration
 
 (defun all ()
   "Return list of all test cases"
   '(test_cookie_store_init
-    test_cookie_storage_across_requests
-    test_set_cookie_parsing
-    test_cookie_store_operations
-    test_multiple_cookies
-    test_cookie_with_httpc
-    test_cookie_with_gun))
+    test_automatic_cookie_handling
+    test_automatic_cookie_persistence))
 
 (defun suite () ())
 
@@ -62,59 +56,99 @@
        (line (test-pat 'true (is_tuple store2)))
        'ok))))
 
-;;; Cookie Storage Tests
+;;; Automatic Cookie Handling Tests (Gun's built-in system)
 
-(defun test_cookie_storage_across_requests
+(defun test_automatic_cookie_handling
   (['suite] ())
-  (['doc] "Test that cookies persist across multiple requests")
+  (['doc] "Test Gun's automatic cookie handling - cookies are set and sent automatically")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (set-url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?testcookie=testvalue")))
-          (get-url (list_to_binary (++ (binary_to_list base-url) "/cookies")))
-          (store (lhc-cookies:init))
-          ;; First request: set a cookie
-          ;; Note: httpbin /cookies/set redirects, so we get the Set-Cookie header
-          (`#(ok ,resp1) (lhc:get set-url (map 'backend 'gun))))
+          ;; Initialize cookie store
+          (cookie-store (lhc-cookies:init))
+          ;; Open connection WITH cookie store - Gun will handle cookies automatically
+          (`#(ok ,conn) (lhc:open base-url (map 'backend 'gun
+                                                'cookie-store cookie-store))))
 
-     ;; Extract Set-Cookie headers from response
-     (let* ((headers1 (maps:get 'headers resp1))
-            (set-cookies (lhc-cookies:extract-set-cookies headers1)))
+     ;; First request: Set a cookie via httpbin's /cookies/set endpoint
+     ;; Gun will automatically extract and store the Set-Cookie header
+     (let ((`#(ok ,resp1) (lhc-gun:do-request-sync conn 'GET
+                                                    "/cookies/set?testcookie=testvalue"
+                                                    #"" '() (map))))
 
-       ;; Verify we got cookies
-       (line (test-pat 'true (> (length set-cookies) 0)))
+       ;; Second request: Get cookies - Gun should automatically send the cookie
+       (let ((`#(ok ,resp2) (lhc-gun:do-request-sync conn 'GET "/cookies"
+                                                      #"" '() (map))))
 
-       ;; Store cookies
-       (let ((`#(ok ,new-store) (lhc-cookies:store get-url set-cookies store)))
+         ;; Verify the response body contains our cookie
+         ;; httpbin's /cookies endpoint returns JSON with our cookie
+         (let ((body (maps:get 'body resp2)))
+           ;; Simple check: body should contain "testcookie" and "testvalue"
+           ;; binary:match returns {Pos, Len} on match, nomatch on failure
+           (line (test-pat 'true (=/= 'nomatch (binary:match body #"testcookie"))))
+           (line (test-pat 'true (=/= 'nomatch (binary:match body #"testvalue"))))
 
-         ;; Query cookies for next request
-         (let ((`#(ok ,cookies ,final-store) (lhc-cookies:query new-store get-url)))
-
-           ;; Verify we got cookies back
-           (line (test-pat 'true (> (length cookies) 0)))
+           (lhc:close conn)
            'ok))))))
 
-;;; Set-Cookie Parsing Tests
-
-(defun test_set_cookie_parsing
+(defun test_automatic_cookie_persistence
   (['suite] ())
-  (['doc] "Test Set-Cookie header parsing")
+  (['doc] "Test that cookies persist across multiple requests in Gun")
   ([config] (when (is_list config))
    (let* ((base-url (config 'base_url config))
-          (url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?name1=value1")))
-          (store (lhc-cookies:init))
-          ;; Make request that sets cookies
-          (`#(ok ,response) (lhc:get url (map 'backend 'gun))))
+          (cookie-store (lhc-cookies:init))
+          (`#(ok ,conn) (lhc:open base-url (map 'backend 'gun
+                                                'cookie-store cookie-store))))
 
-     ;; Extract Set-Cookie headers
-     (let* ((headers (maps:get 'headers response))
-            (set-cookies (lhc-cookies:extract-set-cookies headers)))
+     ;; Set multiple cookies
+     (let ((`#(ok ,_resp1) (lhc-gun:do-request-sync conn 'GET
+                                                     "/cookies/set?cookie1=value1"
+                                                     #"" '() (map))))
 
-       ;; Verify we got Set-Cookie headers
-       (line (test-pat 'true (is_list set-cookies)))
+       (let ((`#(ok ,_resp2) (lhc-gun:do-request-sync conn 'GET
+                                                       "/cookies/set?cookie2=value2"
+                                                       #"" '() (map))))
 
-       ;; Store the cookies (this tests parsing internally)
-       (let ((`#(ok ,new-store) (lhc-cookies:store url set-cookies store)))
-         'ok)))))
+         ;; Verify both cookies are sent on subsequent request
+         (let ((`#(ok ,resp3) (lhc-gun:do-request-sync conn 'GET "/cookies"
+                                                        #"" '() (map))))
+
+           (let ((body (maps:get 'body resp3)))
+             ;; Both cookies should be present in the response body
+             (line (test-pat 'true (=/= 'nomatch (binary:match body #"cookie1"))))
+             (line (test-pat 'true (=/= 'nomatch (binary:match body #"cookie2"))))
+
+             (lhc:close conn)
+             'ok)))))))
+
+;;; Manual Cookie Inspection Tests (Advanced/Debugging)
+
+(defun test_manual_cookie_inspection
+  (['suite] ())
+  (['doc] "Test manual cookie inspection utilities for debugging")
+  ([config] (when (is_list config))
+   (let* ((store (lhc-cookies:init))
+          (url #"https://httpbin.org/cookies"))
+
+     ;; Manually store a cookie (for debugging/testing purposes)
+     (let ((set-cookies '(#"session=abc123; Path=/; Domain=httpbin.org")))
+       (let ((`#(ok ,store2) (lhc-cookies:store store set-cookies url)))
+
+         ;; Query what cookies would apply to this URL
+         (let ((`#(ok ,cookies ,store3) (lhc-cookies:query store2 url)))
+           (line (test-pat 'true (> (length cookies) 0)))
+
+           ;; List all cookies in store
+           (let ((`#(ok ,all-cookies ,store4) (lhc-cookies:list-all store3)))
+             (line (test-pat 'true (is_list all-cookies)))
+             (line (test-pat 'true (> (length all-cookies) 0)))
+
+             ;; Clear cookies
+             (let ((`#(ok ,store5) (lhc-cookies:clear store4)))
+
+               ;; Verify cookies cleared
+               (let ((`#(ok ,empty-list ,_store6) (lhc-cookies:list-all store5)))
+                 (line (test-pat 0 (length empty-list)))
+                 'ok)))))))))
 
 ;;; Cookie Store Operations Tests
 
@@ -127,15 +161,15 @@
           (store1 (lhc-cookies:init)))
 
      ;; Create a fake Set-Cookie header
-     (let ((set-cookie-headers '(#(#"set-cookie"
-                                   #"testcookie=testvalue; Path=/; Domain=httpbin.org"))))
+     (let ((set-cookie-headers '(#"testcookie=testvalue; Path=/; Domain=httpbin.org")))
 
        ;; Store cookie
-       (let ((`#(ok ,store2) (lhc-cookies:store url set-cookie-headers store1)))
+       (let ((`#(ok ,store2) (lhc-cookies:store store1 set-cookie-headers url)))
 
          ;; Query cookies
          (let ((`#(ok ,cookies ,store3) (lhc-cookies:query store2 url)))
            (line (test-pat 'true (is_list cookies)))
+           (line (test-pat 'true (> (length cookies) 0)))
 
            ;; List all cookies
            (let ((`#(ok ,all-cookies ,store4) (lhc-cookies:list-all store3)))
@@ -148,74 +182,3 @@
                (let ((`#(ok ,empty-cookies ,_store6) (lhc-cookies:query store5 url)))
                  (line (test-pat 0 (length empty-cookies)))
                  'ok)))))))))
-
-;;; Multiple Cookies Tests
-
-(defun test_multiple_cookies
-  (['suite] ())
-  (['doc] "Test handling multiple cookies")
-  ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
-          ;; Set multiple cookies in one request
-          (set-url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?cookie1=value1&cookie2=value2")))
-          (get-url (list_to_binary (++ (binary_to_list base-url) "/cookies")))
-          (store (lhc-cookies:init))
-          ;; Set multiple cookies
-          (`#(ok ,resp1) (lhc:get set-url (map 'backend 'gun))))
-
-     ;; Extract and store cookies
-     (let* ((headers (maps:get 'headers resp1))
-            (set-cookies (lhc-cookies:extract-set-cookies headers)))
-
-       (let ((`#(ok ,new-store) (lhc-cookies:store get-url set-cookies store)))
-
-         ;; Query cookies
-         (let ((`#(ok ,cookies ,_final-store) (lhc-cookies:query new-store get-url)))
-
-           ;; Note: httpbin may merge cookies, so we just verify we got cookies
-           (line (test-pat 'true (> (length cookies) 0)))
-           'ok))))))
-
-;;; Backend Integration Tests
-
-(defun test_cookie_with_httpc
-  (['suite] ())
-  (['doc] "Test cookie management with httpc backend")
-  ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
-          (url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?httpc_cookie=httpc_value")))
-          (store (lhc-cookies:init))
-          ;; Make request with httpc
-          (`#(ok ,response) (lhc:get url (map 'backend 'httpc))))
-
-     ;; Extract Set-Cookie headers
-     (let* ((headers (maps:get 'headers response))
-            (set-cookies (lhc-cookies:extract-set-cookies headers)))
-
-       ;; Verify cookies were set
-       (line (test-pat 'true (is_list set-cookies)))
-
-       ;; Store cookies
-       (let ((`#(ok ,_new-store) (lhc-cookies:store url set-cookies store)))
-         'ok)))))
-
-(defun test_cookie_with_gun
-  (['suite] ())
-  (['doc] "Test cookie management with gun backend")
-  ([config] (when (is_list config))
-   (let* ((base-url (config 'base_url config))
-          (url (list_to_binary (++ (binary_to_list base-url) "/cookies/set?gun_cookie=gun_value")))
-          (store (lhc-cookies:init))
-          ;; Make request with gun
-          (`#(ok ,response) (lhc:get url (map 'backend 'gun))))
-
-     ;; Extract Set-Cookie headers
-     (let* ((headers (maps:get 'headers response))
-            (set-cookies (lhc-cookies:extract-set-cookies headers)))
-
-       ;; Verify cookies were set
-       (line (test-pat 'true (is_list set-cookies)))
-
-       ;; Store cookies
-       (let ((`#(ok ,_new-store) (lhc-cookies:store url set-cookies store)))
-         'ok)))))

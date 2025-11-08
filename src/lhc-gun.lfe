@@ -255,12 +255,12 @@
      ;; Final data
      (`#(gun_data ,conn-pid ,s-ref fin ,data)
       (when (=:= conn-pid conn) (=:= s-ref stream-ref))
-      `#(ok ,(binary acc data)))
+      `#(ok ,(binary (acc binary) (data binary))))
 
      ;; More data coming
      (`#(gun_data ,conn-pid ,s-ref nofin ,data)
       (when (=:= conn-pid conn) (=:= s-ref stream-ref))
-      (collect-body conn stream-ref timeout (binary acc data)))
+      (collect-body conn stream-ref timeout (binary (acc binary) (data binary))))
 
      ;; Trailers (end of response)
      (`#(gun_trailers ,conn-pid ,s-ref ,_trailers)
@@ -369,19 +369,25 @@
     gun options map"
   ((uri-map opts)
    (let* ((gun-opts (maps:get 'gun-opts opts (map)))
+          (cookie-store (maps:get 'cookie-store opts 'undefined))
           (transport (get-transport uri-map))
           (protocols (maps:get 'protocols gun-opts
                                (get-default-protocols transport)))
           (retry (maps:get 'retry gun-opts 5))
           (retry-timeout (maps:get 'retry-timeout gun-opts 5000))
-          (connect-timeout (maps:get 'connect-timeout opts 5000)))
+          (connect-timeout (maps:get 'connect-timeout opts 5000))
+          ;; Build base options list
+          (base-opts `(#(transport ,transport)
+                       #(protocols ,protocols)
+                       #(retry ,retry)
+                       #(retry_timeout ,retry-timeout)
+                       #(connect_timeout ,connect-timeout)))
+          ;; Add cookie-store if provided
+          (opts-with-cookies (if (=/= cookie-store 'undefined)
+                               (cons `#(cookie_store ,cookie-store) base-opts)
+                               base-opts)))
      (maps:merge
-      (maps:from_list
-       `(#(transport ,transport)
-         #(protocols ,protocols)
-         #(retry ,retry)
-         #(retry_timeout ,retry-timeout)
-         #(connect_timeout ,connect-timeout)))
+      (maps:from_list opts-with-cookies)
       (get-protocol-options gun-opts)))))
 
 (defun get-transport

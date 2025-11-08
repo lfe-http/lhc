@@ -403,12 +403,12 @@
       `#(ok ,(maps:from_list
               `(#(status ,status)
                 #(headers ,(lhc-gun:normalize-headers headers))
-                #(body ,(binary acc data))))))
+                #(body ,(binary (acc binary) (data binary)))))))
 
      ;; More data
      (`#(gun_data ,c ,s-ref nofin ,data)
       (when (=:= c conn) (=:= s-ref stream-ref))
-      (await-gun-body conn stream-ref status headers timeout (binary acc data)))
+      (await-gun-body conn stream-ref status headers timeout (binary (acc binary) (data binary))))
 
      ;; Trailers (end of response)
      (`#(gun_trailers ,c ,s-ref ,trailers)
