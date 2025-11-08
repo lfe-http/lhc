@@ -193,17 +193,14 @@
           (connect-timeout (maps:get 'connect-timeout opts timeout))
           (ssl-opts (maps:get 'ssl-opts opts '()))
           (autoredirect (maps:get 'autoredirect httpc-opts
-                                   (maps:get 'follow-redirects opts 'true)))
-          (max-redirect (maps:get 'max-redirect httpc-opts
-                                  (maps:get 'max-redirects opts 5))))
+                                   (maps:get 'follow-redirects opts 'true))))
      (lists:flatten
       `(#(timeout ,timeout)
         #(connect_timeout ,connect-timeout)
         ,(if (> (length ssl-opts) 0)
            `(#(ssl ,ssl-opts))
            '())
-        #(autoredirect ,autoredirect)
-        #(max_redirect ,max-redirect))))))
+        #(autoredirect ,autoredirect))))))
 
 (defun make-httpc-options
   "Convert LHC options to httpc options().
